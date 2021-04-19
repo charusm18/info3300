@@ -1,0 +1,135 @@
+
+<html><head>
+    
+      <link href="https://fonts.googleapis.com/css?family=Lato:400,700|Raleway:400,700" rel="stylesheet">
+      <script src="https://d3js.org/d3.v6.min.js"></script>
+      <script src="https://d3js.org/topojson.v2.min.js"></script>
+      <style>
+    
+      .state {
+        fill: lightgrey;
+      }
+    
+      .outline {
+        stroke: black;
+        stroke-width: 1px;
+        fill: none;
+      }
+      
+      .mouseover {
+        stroke-width: 3px;
+        pointer-events: none;
+      }
+
+      .nation {
+    fill: #ddd;
+  }
+
+  /* .outline {
+    stroke: #fff;
+    stroke-width: 1px;
+    fill: none;
+  } */
+    
+      </style>
+    
+    </head>
+    <body>
+      <div class="container larger">    
+    
+      <svg id="choropleth" height="600" width="900" style="background: #445; margin-top:50px" >
+    
+      </svg>
+    
+      <svg id="obesity" height="610" width="975" style="background: #fff; margin-top:50px" >
+
+      </svg>
+    
+    <pre>    
+          <script id="notes1">
+    
+      const svg = d3.select("#choropleth");
+      const width = svg.attr("width");
+      const height = svg.attr("height");
+      const margin = { top: 20, right: 20, bottom: 20, left:20};
+      const mapWidth = width - margin.left - margin.right;
+      const mapHeight = height - margin.top - margin.bottom;
+      const map = svg.append("g")
+                      .attr("transform","translate("+margin.left+","+margin.top+")");
+
+      const obsvg = d3.select("#obesity");
+      const obwidth = obsvg.attr("width");
+      const obheight = obsvg.attr("height");
+      const obmapWidth = obwidth;
+      const obmapHeight = obheight;
+      const ffmap = obsvg.append("g");
+
+                    
+      const requestData = async function() {
+        const fipsCode = await d3.csv("../fips.csv");
+        const stateNames = await d3.tsv("../us-state-names.tsv");
+
+        const us = await d3.json("../us-smaller.json");
+      
+        var states = topojson.feature(us, us.objects.states);
+        var statesMesh = topojson.mesh(us, us.objects.states);
+        var projection = d3.geoAlbersUsa().fitSize([mapWidth, mapHeight], states);
+        var path = d3.geoPath().projection(projection);
+        
+        map.selectAll("path.state").data(states.features)
+           .join("path")
+           .attr("class", "state")
+           .attr("note", d => d.id)
+           .attr("d", path);
+      
+        map.append("path").datum(statesMesh)
+           .attr("class","outline")
+           .attr("d", path);
+
+        //------------------------------------------------------------------//
+        const count = await d3.json("../counties-10m.json");
+    
+        var projection = d3.geoAlbersUsa().scale(1300).translate([487.5, 305]);
+        var path = d3.geoPath().projection(projection);
+        var nation = topojson.feature(count, count.objects.nation);
+        var counties = topojson.feature(count, count.objects.counties);
+        var statesMesh = topojson.mesh(count, count.objects.states);    
+        
+        //counties.features is a list of dictionaries
+        //change it so that it is a dictionary mapping state to the list of dictionary counties
+        const countyDictionary = {}
+        for(var i = 0; i < stateNames.length; i++){
+          countyDictionary[stateNames[i]['code']] =[]
+        }
+    
+        for(var i = 0; i < counties.features.length; i++){
+          for(var j = 0; j < fipsCode.length; j++){
+            if(fipsCode[j]['STCOUNTYFP'] == parseInt(counties.features[i].id)){
+              var newList = countyDictionary[fipsCode[j]['STATE']]
+              newList.push(counties.features[i])
+              countyDictionary[fipsCode[j]['STATE']] = newList
+            }
+
+          }
+        }
+
+        ffmap.selectAll("path.health").data(countyDictionary['CO'])
+              .join("path")
+              .attr("class","health")
+              .attr("d", path)
+              .attr("fill", "gray" );
+     
+
+      };
+      requestData();
+    
+    
+      </script>
+    
+    
+    
+    
+      </div>
+    </body>
+    </html>
+    
