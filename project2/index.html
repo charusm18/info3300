@@ -44,9 +44,7 @@
       <svg id="obesity" height="610" width="975" style="background: #fff; margin-top:50px" >
 
       </svg>
-    
-    <pre>    
-          <script id="notes1">
+      <script id="notes1">
     
       const svg = d3.select("#choropleth");
       const width = svg.attr("width");
@@ -66,10 +64,13 @@
 
                     
       const requestData = async function() {
+        
         const fipsCode = await d3.csv("../fips.csv");
         const stateNames = await d3.tsv("../us-state-names.tsv");
-
         const us = await d3.json("../us-smaller.json");
+        const pop = await d3.csv("../PopulationEstimates.csv");
+        const crime = await d3.csv("../crime.csv");
+        const police = await d3.csv("../police.csv");
       
         var states = topojson.feature(us, us.objects.states);
         var statesMesh = topojson.mesh(us, us.objects.states);
@@ -86,14 +87,44 @@
            .attr("class","outline")
            .attr("d", path);
 
+        let idToState = {} 
+        stateNames.forEach( row => {
+          idToState[row.id] = row.name;
+        });
+
+        let stateToCode = {} 
+        stateNames.forEach( row => {
+          stateToCode[row.name] = row.code;
+        });
+
+        let fipsToPop = {} 
+        pop.forEach( row => {
+          fipsToPop[row.FIPS] = row.POP_2019;
+        });
+
+        let fipsToCounty = {} 
+        pop.forEach( row => {
+          fipsToCounty[row.FIPS] = row.Area_Name;
+        });
+
+        let countyToCrime = {} 
+        let crimeRange = []
+        crime.forEach( row => {
+          countyToCrime[row.County] = row.total_crime;
+          crimeRange.push(row.total_crime);
+        });
+
+        let countyToPolice = {} 
+        let policeRange = []
+        police.forEach( row => {
+          countyToPolice[row.County] = row.Total_law;
+          policeRange.push(row.Total_law);
+        });
+
         //------------------------------------------------------------------//
         const count = await d3.json("../counties-10m.json");
     
-        var projection = d3.geoAlbersUsa().scale(1300).translate([487.5, 305]);
-        var path = d3.geoPath().projection(projection);
-        var nation = topojson.feature(count, count.objects.nation);
         var counties = topojson.feature(count, count.objects.counties);
-        var statesMesh = topojson.mesh(count, count.objects.states);    
         
         //counties.features is a list of dictionaries
         //change it so that it is a dictionary mapping state to the list of dictionary counties
@@ -111,13 +142,53 @@
             }
 
           }
-        }
+        }        
+  
+    d3.selectAll(".state").on("click", displayState);
 
-        ffmap.selectAll("path.health").data(countyDictionary['CO'])
-              .join("path")
-              .attr("class","health")
-              .attr("d", path)
-              .attr("fill", "gray" );
+    let colorMatrix = [ ["#e8e8e8", "#ace4e4", "#5ac8c8"],
+                        ["#dfb0d6", "#a5add3", "#5698b9"],
+                        ["#be64ac", "#8c62aa", "#3b4994"] ];
+
+
+    let crimeScale = d3.scaleQuantile().domain(crimeRange).range([0,1,2]);   
+    let policingScale = d3.scaleQuantile().domain(policeRange).range([0,1,2]);
+  
+    function displayState() {
+      let state = d3.select(this);
+      let stateID = state.datum().id;
+      var stateAbr = stateToCode[idToState[stateID]];
+
+  
+      var projection = d3.geoMercator().fitSize([obmapWidth, obmapHeight], {type: "FeatureCollection", features: countyDictionary[stateAbr]});
+      var path = d3.geoPath().projection(projection);
+      ffmap.selectAll("path.health").data(countyDictionary[stateAbr])
+            .join("path")
+            .attr("class","county")
+            .attr("d", path)
+            .attr("fill", d => { 
+              console.log(d)
+                  let crimeIndex = crimeScale(countyToCrime[d.properties.name]);
+                  let policeIndex = policingScale(countyToPolice[d.properties.name]);
+                  if (crimeIndex === undefined | policeIndex === undefined) {
+                      return "";  // No fill
+                  }
+                  else {
+                    return colorMatrix[ crimeIndex ][ policeIndex ];
+            };})
+
+      d3.selectAll(".county").on("click", countyHover);
+
+      function countyHover() {
+        let county = d3.select(this);
+        let fipsID = county.datum().id;
+        console.log(fipsToCounty[fipsID], fipsToPop[fipsID]);
+      }
+    }
+
+    
+
+        
      
 
       };
