@@ -74,9 +74,11 @@
       </svg>
        <div class ="stateBox">
           <p id = "p1" class = "stateLabel"></p>
+         
        </div>
        <div class ="countyBox">
-        <p id = "p2" class = "stateLabel"></body>
+        <p id = "p2" class = "stateLabel"></p>
+        <svg id = "pieChart" width = 300 height = 300></svg>
      </div>
   
       <script>
@@ -148,6 +150,7 @@
           crimeRange.push(row.total_crime);
         });
 
+      
         let countyToPolice = {} 
         let policeRange = []
         police.forEach( row => {
@@ -259,12 +262,44 @@
         
         d3.select("#p2").text(fipsToCounty[parseInt(fipsID)])
         console.log(fipsToCounty[parseInt(fipsID)], fipsToPop[fipsID]);
+
+        let data= {}
+        crime.forEach( row => {
+          crimeRates[parseInt(row.FIPS)] = row.total_crime;
+          crimeRange.push(row.total_crime);
+        });
+
+        var data = [1.1,2.2,4.46,2.12,1.36,5.002445,4.1242];
+        var svgCounty = d3.select("#pieChart");
+        let g = svgCounty.append("g")
+                .attr("transform", "translate(200,200)");
+            
+        // Creating Pie generator
+        var pie = d3.pie();
+        // Creating arc
+        var arc = d3.arc()
+                    .innerRadius(0)
+                    .outerRadius(100);
+
+        // Grouping different arcs
+        var arcs = g.selectAll("arc")
+                    .data(pie(data))
+                    .enter()
+                    .append("g");
+
+        // Appending path 
+        arcs.append("path")
+            .attr("fill", (data, i)=>{
+                let value=data.data;
+                return d3.schemeSet3[i];
+            })
+            .attr("d", arc);
+      
       }
       d3.select("#p2").text("")
       d3.select("#p1").text(stateName)
+
       
-   
-   
     }
     
    

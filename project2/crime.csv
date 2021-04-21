@@ -1,9 +1,4 @@
-FIPS,State,County,"Murder and
-nonnegligent
-manslaughter","Rape
-(revised
-definition)",Robbery,"Aggravated
-assault",Burglary,"Larceny-
+FIPS,State,County,Murder,Rape,Robbery,Assault,Burglary,"Larceny-
 theft","Motor
 vehicle
 theft",Arson,total_crime
