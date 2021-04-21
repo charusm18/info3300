@@ -1,7 +1,4 @@
-FIPS,State,County,Murder,Rape,Robbery,Assault,Burglary,"Larceny-
-theft","Motor
-vehicle
-theft",Arson,total_crime
+FIPS,State,County,Murder,Rape,Robbery,Assault,Burglary,Larceny,Motor,Arson,total_crime
 1001,AL,Autauga,1,12,8,52,146,233,50,,1004
 1003,AL,Baldwin,1,5,23,98,229,342,42,,1480
 1007,AL,Bibb,0,0,0,0,20,14,3,,74
