@@ -76,9 +76,11 @@
         <svg width="300" height="350" id = "stateBox"></svg>
 
           <p id = "p1" class = "stateLabel"></p>
+         
        </div>
        <div class ="countyBox">
-        <p id = "p2" class = "stateLabel">
+        <p id = "p2" class = "stateLabel"></p>
+        <svg id = "pieChart" width = 300 height = 300></svg>
      </div>
     </body>
   
@@ -154,6 +156,22 @@
           crimeRange.push(row.total_crime);
         });
 
+        let countyCrimeRates = {} 
+        crime.forEach( row => {
+          let crimeRates= []
+          crimeRates.push(row.Murder/row.total_crime);
+          crimeRates.push(row.Rape/row.total_crime);
+          crimeRates.push(row.Robbery/row.total_crime);
+          crimeRates.push(row.Assault/row.total_crime);
+          crimeRates.push(row.Burglary/row.total_crime);
+          crimeRates.push(row.Larceny/row.total_crime);
+          crimeRates.push(row.Motor/row.total_crime);
+          crimeRates.push(row.Arson/row.total_crime);
+          countyCrimeRates[parseInt(row.FIPS)] = crimeRates;
+
+        });
+
+      
         let countyToPolice = {} 
         let policeRange = []
         police.forEach( row => {
@@ -256,6 +274,8 @@
 
       
       d3.selectAll(".county").on("click", countyHover);
+      let valueExtent = d3.extent(crime, d => d.total_crime);
+      let colorScale = d3.scaleSequential(d3.interpolateViridis).domain(valueExtent)
 
       //determines what to do when you click on a county
       function countyHover() {
@@ -263,7 +283,47 @@
         let fipsID = county.datum().id;
         
         d3.select("#p2").text(fipsToCounty[parseInt(fipsID)])
-      }
+        console.log(fipsToCounty[parseInt(fipsID)], fipsToPop[fipsID]);
+
+      // PIE CHART
+      var data= countyCrimeRates[parseInt(fipsID)]
+      var svgCounty = d3.select("#pieChart");
+      let g = svgCounty.append("g")
+              .attr("transform", "translate(200,200)");
+      console.log("data: " + data)
+          
+      // Creating Pie generator
+      var pie = d3.pie();
+      // Creating arc
+      var arc = d3.arc()
+                  .innerRadius(0)
+                  .outerRadius(100);
+
+      // Grouping different arcs
+      var arcs = g.selectAll("arc")
+                  .data(pie(data))
+                  .enter()
+                  .append("g");
+      var colorScale = d3.scaleOrdinal()
+                        .domain(["murder", "rape", "robbery", "assault", "burgalry", "larceny", "motor", "arson" ])
+                        .range(["#264653", "#2A9D8F", "#E9C46A", "#F4A261", "#E76F51", "#05668D", "#E5989B", "#4A6FA5"]);
+
+      // Appending path 
+      let crimeTypes = ["murder", "rape", "robbery", "assault", "burgalry", "larceny", "motor", "arson"]
+      // let index = 0
+      arcs.append("path")
+          .attr("fill", (data, i)=>{
+            console.log("i: " + i)
+            let value=data.data;
+            console.log("one step before: " + crimeTypes[i])
+            console.log("color: " + colorScale[crimeTypes[i]])
+            return colorScale(crimeTypes[i]);
+
+            
+          })
+          .attr("d", arc);
+
+      }      
       d3.select("#p2").text("")
       d3.selectAll("#p1").text(stateName + " Statistics")
       
