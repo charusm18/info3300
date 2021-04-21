@@ -203,16 +203,16 @@
   
     d3.selectAll(".state").on("click", displayState);
 
-    let colorMatrix = [ ["#e8e8e8", "#ace4e4", "#5ac8c8"],
-                        ["#dfb0d6", "#a5add3", "#5698b9"],
-                        ["#be64ac", "#8c62aa", "#3b4994"] ];
+    let colorMatrix = [ ["#C9D7DC", "#99B1D1", "#5E8CD0"],
+                        ["#9CC3B6", "#73A4B4", "#4A82B3"],
+                        ["#63B294", "#4E9592", "#377791"] ];
 
     let crimeScale = d3.scaleQuantile().domain(crimeRange).range([0,1,2]);   
     let policingScale = d3.scaleQuantile().domain(policeRange).range([0,1,2]);
 
      //legend code      
     let legend = statemap.append("g").attr("class","legend")
-                     .attr("transform","translate(820,470) rotate(-45)");
+                     .attr("transform","translate(10,470) rotate(-45)");
     for (let i=0; i<colorMatrix.length; i++) {
      for (let j=0; j<colorMatrix.length; j++) {
        legend.append("rect")
@@ -254,7 +254,7 @@
       var stateName = idToState[stateID]
       
   
-      var projection = d3.geoMercator().fitSize([stWidth, stHeight], {type: "FeatureCollection", features: countyDictionary[stateAbr]});
+      var projection = d3.geoMercator().fitSize([stWidth-200, stHeight-200], {type: "FeatureCollection", features: countyDictionary[stateAbr]});
       var path = d3.geoPath().projection(projection);
       statemap.selectAll("path.county").data(countyDictionary[stateAbr])
             .join("path")
@@ -265,7 +265,7 @@
                   let policeIndex = policingScale(countyToPolice[parseInt(d.id)]);
 
                   if (crimeIndex === undefined | policeIndex === undefined) {
-                      return "grey";  // No fill
+                      return "#878787";  // No fill
                   }
                   else {
                     return colorMatrix[crimeIndex][policeIndex];
