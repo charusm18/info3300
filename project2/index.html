@@ -80,7 +80,7 @@
        </div>
        <div class ="countyBox">
         <p id = "p2" class = "stateLabel"></p>
-        <svg id = "pieChart" width = 300 height = 300></svg>
+        <svg id = "pieChart" width = 500 height = 500></svg>
      </div>
     </body>
   
@@ -286,11 +286,15 @@
         console.log(fipsToCounty[parseInt(fipsID)], fipsToPop[fipsID]);
 
       // PIE CHART
+      
       var data= countyCrimeRates[parseInt(fipsID)]
       var svgCounty = d3.select("#pieChart");
+      const pieChart = d3.selectAll("svg#pieChart");
+      pieChart.selectAll("*").remove();  
       let g = svgCounty.append("g")
-              .attr("transform", "translate(200,200)");
+              .attr("transform", "translate(100,150)");
       console.log("data: " + data)
+      
           
       // Creating Pie generator
       var pie = d3.pie();
@@ -305,11 +309,11 @@
                   .enter()
                   .append("g");
       var colorScale = d3.scaleOrdinal()
-                        .domain(["murder", "rape", "robbery", "assault", "burgalry", "larceny", "motor", "arson" ])
+                        .domain(["Murder", "Rape", "Robbery", "Assault", "Burgalry", "Larceny", "Motor", "Arson" ])
                         .range(["#264653", "#2A9D8F", "#E9C46A", "#F4A261", "#E76F51", "#05668D", "#E5989B", "#4A6FA5"]);
 
       // Appending path 
-      let crimeTypes = ["murder", "rape", "robbery", "assault", "burgalry", "larceny", "motor", "arson"]
+      let crimeTypes = ["Murder", "Rape", "Robbery", "Assault", "Burgalry", "Larceny", "Motor", "Arson"]
       // let index = 0
       arcs.append("path")
           .attr("fill", (data, i)=>{
@@ -322,9 +326,37 @@
             
           })
           .attr("d", arc);
+          
+        
+
+          // Add one dot in the legend for each name.
+          svgCounty.selectAll("mydots")
+            .data(crimeTypes)
+            .enter()
+            .append("circle")
+              .attr("cx", 100)
+              .attr("cy", function(d,i){ return 100 + i*25}) // 100 is where the first dot appears. 25 is the distance between dots
+              .attr("r", 7)
+              .style("fill", function(d){ return colorScale(d)})
+              .attr("transform","translate(120,-40)")
+
+          // Add one dot in the legend for each name.
+          svgCounty.selectAll("mylabels")
+            .data(crimeTypes)
+            .enter()
+            .append("text")
+              .attr("x", 120)
+              .attr("y", function(d,i){ return 100 + i*25}) // 100 is where the first dot appears. 25 is the distance between dots
+              .style("fill", function(d){ return colorScale(d)})
+              .text(function(d){ return d})
+              .attr("text-anchor", "left")
+              .style("alignment-baseline", "middle")
+              .attr("transform","translate(120,-40)")
+       
 
       }      
       d3.select("#p2").text("")
+      d3.selectAll("svg#pieChart").selectAll("*").remove();
       d3.selectAll("#p1").text(stateName + " Statistics")
       
       var barChart = d3.selectAll("svg#stateBox"),
