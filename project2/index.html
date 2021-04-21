@@ -20,6 +20,34 @@
         stroke-width: 3px;
         pointer-events: none;
       }
+      .stateBox{
+        width: 350px;
+        height: 500px;
+        padding: 10px;
+        border: 5px solid black ;
+        margin: 0;
+        position: fixed;
+        bottom: 10;
+        right: 422;
+      }
+      .countyBox{
+        width: 350px;
+        height: 500px;
+        padding: 10px;
+        border: 5px solid black ;
+        margin: 0;
+        position: fixed;
+        bottom: 10;
+        right: 40;
+      }
+
+
+      .stateLabel{
+        color: black;
+        font-size:160%;
+        font-weight: bold;
+        margin: 0;
+      }
 
       .nation {
     fill: #ddd;
@@ -44,6 +72,13 @@
       <svg id="statemap" height="610" width="975" style="background: #fff; margin-top:50px" >
 
       </svg>
+       <div class ="stateBox">
+          <p id = "p1" class = "stateLabel"></p>
+       </div>
+       <div class ="countyBox">
+        <p id = "p2" class = "stateLabel"></body>
+     </div>
+  
       <script>
     
       const svg = d3.select("#usmap");
@@ -98,7 +133,7 @@
 
         let fipsToPop = {} 
         pop.forEach( row => {
-          fipsToPop[row.FIPS] = row.POP_2019;
+          fipsToPop[row.FIPS] = row.POP_2016;
         });
 
         let fipsToCounty = {} 
@@ -190,7 +225,9 @@
       let state = d3.select(this);
       let stateID = state.datum().id;
       var stateAbr = stateToCode[idToState[stateID]];
+      var stateName = idToState[stateID]
       console.log(stateAbr)
+      
   
       var projection = d3.geoMercator().fitSize([stWidth, stHeight], {type: "FeatureCollection", features: countyDictionary[stateAbr]});
       var path = d3.geoPath().projection(projection);
@@ -219,24 +256,26 @@
       function countyHover() {
         let county = d3.select(this);
         let fipsID = county.datum().id;
-        console.log(fipsToCounty[fipsID], fipsToPop[fipsID]);
-      }
-    }
-
-    
-
         
-     
-
+        d3.select("#p2").text(fipsToCounty[parseInt(fipsID)])
+        console.log(fipsToCounty[parseInt(fipsID)], fipsToPop[fipsID]);
+      }
+      d3.select("#p2").text("")
+      d3.select("#p1").text(stateName)
+      
+   
+   
+    }
+    
+   
       };
       requestData();
     
     
       </script>
+     
     
-    
-    
-    
+
       </div>
     </body>
     </html>
