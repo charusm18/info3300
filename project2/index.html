@@ -26,9 +26,8 @@
         padding: 10px;
         border: 5px solid black ;
         margin: 0;
-        position: fixed;
-        bottom: 10;
-        right: 422;
+        display: inline-block;
+
       }
       .countyBox{
         width: 350px;
@@ -36,9 +35,7 @@
         padding: 10px;
         border: 5px solid black ;
         margin: 0;
-        position: fixed;
-        bottom: 10;
-        right: 40;
+        display: inline-block;
       }
 
 
@@ -68,9 +65,8 @@
       <svg id="usmap" height="600" width="900" style="background: #445; margin-top:50px" >
     
       </svg>
-    
-      <svg id="statemap" height="610" width="975" style="background: #fff; margin-top:50px" >
-
+    <br>
+      <svg id="statemap" height="610" width="600" style="background: #fff; margin-top:50px" >
       </svg>
       <div class ="stateBox">
         <p id = "p1" class = "stateLabel"></p>
@@ -392,6 +388,8 @@
         county.attr("stroke","white")
            .attr("stroke-width", 1);
       }
+      
+      
       d3.select("#p2").text("")
       d3.selectAll("svg#pieChart").selectAll("*").remove();
       d3.selectAll("#p1").text(stateName + " Statistics")
@@ -404,7 +402,7 @@
       const stateScale = d3.scaleLinear().domain([0, 1]).range([margin, width]);
       const spendingScale = d3.scaleLinear().domain([172,864]).range([height-1,0]);
       barChart.selectAll("*").remove();     
-       barChart.append("line")
+      barChart.append("line")
                   .attr("x1",stateScale(0) )
                   .attr("x2",stateScale(0) )
                   .attr("y1",height)
@@ -413,7 +411,7 @@
                   .style("stroke-width", 45)
                   .attr("fill", 'grey')
           
-        barChart.append("line")
+      barChart.append("line")
                   .attr("x1",stateScale(1)) //50 accounts for the padding
                   .attr("x2",stateScale(1))
                   .attr("y1",height)
@@ -422,30 +420,30 @@
                   .style("stroke-width", 45)
                   .attr("fill",'grey')
 
-        barChart.append("text")
+      barChart.append("text")
                     .attr("class", "x label")
                     .attr("text-anchor", "middle")
                     .attr("x", stateScale(0))
                     .attr("y", height + 20)
                     .text(stateToCode[stateName]);
 
-        barChart.append("text")
+      barChart.append("text")
                     .attr("class", "x label")
                     .attr("text-anchor", "middle")
                     .attr("x", stateScale(1))
                     .attr("y", height + 20)
                     .text("US");
 
-          //for each bar, create a label on top of bar with percentage for 2010
-          barChart.append("text")
+        //for each bar, create a label on top of bar with percentage for 2010
+        barChart.append("text")
                   .attr("text-anchor","middle")
                   .attr("font-size","20px")
                   .attr("x",stateScale(0))
                   .attr('y',spendingScale(stateToSpending[stateName]) - 10)
                   .text("$"+stateToSpending[stateName]+' K');
           
-          //for each bar, create a label on top of bar with percentage for 2019
-          barChart.append("text")
+        //for each bar, create a label on top of bar with percentage for 2019
+        barChart.append("text")
                   .attr("text-anchor","middle")
                   .attr("font-size","20px")
                   .attr("x",stateScale(1))
@@ -459,7 +457,7 @@
       const crimeStateScale = d3.scaleLinear().domain([3452.8, 12076.5]).range([height2-1,0]);
 
       crimeChart.selectAll("*").remove();     
-       crimeChart.append("line")
+      crimeChart.append("line")
                   .attr("x1",stateScale(0) )
                   .attr("x2",stateScale(0) )
                   .attr("y1",height2)
@@ -468,7 +466,7 @@
                   .style("stroke-width", 45)
                   .attr("fill", 'grey')
           
-        crimeChart.append("line")
+      crimeChart.append("line")
                   .attr("x1",stateScale(1))
                   .attr("x2",stateScale(1))
                   .attr("y1",height2)
@@ -477,41 +475,34 @@
                   .style("stroke-width", 45)
                   .attr("fill",'grey')
 
-        crimeChart.append("text")
+      crimeChart.append("text")
                     .attr("class", "x label")
                     .attr("text-anchor", "middle")
                     .attr("x", stateScale(0))
                     .attr("y", height2 + 20)
                     .text(stateToCode[stateName]);
 
-        crimeChart.append("text")
+      crimeChart.append("text")
                     .attr("class", "x label")
                     .attr("text-anchor", "middle")
                     .attr("x", stateScale(1))
                     .attr("y", height2 + 20)
                     .text("US");
 
-          //for each bar, create a label on top of bar with percentage for 2010
-          crimeChart.append("text")
+        crimeChart.append("text")
                   .attr("text-anchor","middle")
                   .attr("font-size","20px")
                   .attr("x",stateScale(0))
                   .attr('y',crimeStateScale(stateToCrime[stateName]) - 10)
                   .text(stateToCrime[stateName]);
           
-          //for each bar, create a label on top of bar with percentage for 2019
-          crimeChart.append("text")
+        crimeChart.append("text")
                   .attr("text-anchor","middle")
                   .attr("font-size","20px")
                   .attr("x",stateScale(1))
                   .attr('y', crimeStateScale(stateToCrime['United States'] ) - 10)
-                  .text(stateToCrime['United States']);
+                  .text(stateToCrime['United States']);   
 
-          crimeChart.raise()
-          //barChart.raise()
-
-   
-   
     }
     
    
