@@ -66,7 +66,7 @@
     </head>
     <body>
       <div class= "country_container">
-        <svg id="usmap" height="600" width="900" style="background: #445; margin-top:50px" >
+        <svg id="usmap" height="600" width="900" style="background: #264653; margin-top:50px" >
         </svg>
       </div>
       
@@ -324,7 +324,6 @@
       pieChart.selectAll("*").remove();  
       let g = svgCounty.append("g")
               .attr("transform", "translate(100,150)");
-      console.log("data: " + data)
       if(data == undefined){
         pieChart.append("text")
                     .attr("class", "x label")
@@ -386,7 +385,8 @@
       arcs.append("path")
           .attr("fill", (data, i)=>{
             let value=data.data;
-            return colorScale(crimeTypes[i]);            
+            return colorScale(crimeTypes[i]);
+            
           })
           .attr("d", arc)
           .attr("dataVal", d=> d.data)
@@ -550,6 +550,14 @@
                           
           bottomAxis(element2);
 
+
+          d3.selectAll("#stateDiv").append("text")
+                    .attr("class", "x label")
+                    .attr("text-anchor", "middle")
+                    .attr("x",170)
+                    .attr("y",200)
+                    .text(stateName + " spends $"+ stateToSpending[stateName] + "K a year on police spending, \n which is "+ "34" + "more than the national average");
+
       var crimeChart = d3.selectAll("svg#crimeBox"),
         margin = 200,
         width2 = barChart.attr("width")-margin,
@@ -601,7 +609,29 @@
                   .attr("font-size","20px")
                   .attr("x",stateScale(1))
                   .attr('y', crimeStateScale(stateToCrime['United States'] ) - 10)
-                  .text(stateToCrime['United States']);   
+                  .text(stateToCrime['United States']);  
+                  
+        let leftAxis2 = d3.axisLeft(crimeStateScale).ticks(3).tickSizeOuter(0);
+                  crimeChart.append("g")
+            .attr("class", "y axis")
+            .attr("transform","translate("+(margin-width-50)+","+(margin-width-100)+")") 
+            .call(leftAxis2);
+
+          let bottomAxis3 = d3.axisBottom(stateScale).tickValues([])
+                            .tickSizeOuter(0)
+          // d3.barChart.axis().outerTickSize(0);
+
+          let element1 = crimeChart.append("g")
+                          .attr("class", "x axis")
+                          .attr("transform","translate("+(margin-height-75)+","+(margin-25)+")")
+                          
+          bottomAxis3(element1);
+          let bottomAxis4 = d3.axisBottom(stateScale).tickValues([]);
+          let element3 = crimeChart.append("g")
+                          .attr("class", "x axis")
+                          .attr("transform","translate("+(margin-height+25)+","+(margin-25)+")")
+                          
+          bottomAxis(element3);
 
     }
     
