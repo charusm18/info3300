@@ -62,13 +62,13 @@
     <body>
       <div class="container larger">    
     
-      <svg id="usmap" height="600" width="900" style="background: #445; margin-top:50px" >
+      <svg id="usmap" height="600" width="900" style="background: #264653; margin-top:50px" >
     
       </svg>
     <br>
       <svg id="statemap" height="610" width="600" style="background: #fff; margin-top:50px" >
       </svg>
-      <div class ="stateBox">
+      <div class ="stateBox" id = "stateDiv">
         <p id = "p1" class = "stateLabel"></p>
         <svg width="300" height="225" id = "stateBox"></svg>
         <svg width="300" height="225" id = "crimeBox"></svg>
@@ -483,6 +483,14 @@
                           .attr("transform","translate("+(margin-height)+","+(margin-50)+")")
                           
           bottomAxis(element2);
+
+
+          d3.selectAll("#stateDiv").append("text")
+                    .attr("class", "x label")
+                    .attr("text-anchor", "middle")
+                    .attr("x",170)
+                    .attr("y",200)
+                    .text(stateName + " spends $"+ stateToSpending[stateName] + "K a year on police spending, \n which is "+ "34" + "more than the national average");
 
       var crimeChart = d3.selectAll("svg#crimeBox"),
         margin = 200,
