@@ -72,19 +72,19 @@
       <svg id="statemap" height="610" width="975" style="background: #fff; margin-top:50px" >
 
       </svg>
-       <div class ="stateBox">
-        <svg width="300" height="350" id = "stateBox"></svg>
+      <div class ="stateBox">
+        <p id = "p1" class = "stateLabel"></p>
+        <svg width="300" height="225" id = "stateBox"></svg>
+        <svg width="300" height="225" id = "crimeBox"></svg>
+      </div>
 
-          <p id = "p1" class = "stateLabel"></p>
-         
-       </div>
-       <div class ="countyBox">
+      <div class ="countyBox">
         <p id = "p2" class = "stateLabel"></p>
-        <svg id = "pieChart" width = 300 height = 300></svg>
+        <svg id = "pieChart" width = 500 height = 500></svg>
      </div>
     </body>
   
-      <script>
+    <script>
     
       const svg = d3.select("#usmap");
       const width = svg.attr("width");
@@ -108,6 +108,8 @@
         const crime = await d3.csv("../crime.csv");
         const police = await d3.csv("../police.csv");
         const spending = await d3.csv("../police_spending.csv");
+        const state_crime = await d3.csv("../state_crime.csv");
+
 
         const count = await d3.json("../counties-10m.json");
         const us = await d3.json("../us-smaller.json");
@@ -183,6 +185,11 @@
         spending.forEach( row => {
           stateToSpending[row.State] = row.Police;
         });
+
+        let stateToCrime = {} 
+        state_crime.forEach( row => {
+          stateToCrime[row.State] = row.state_rate;
+        });
   //------------------------------------------------------------------//    
         var counties = topojson.feature(count, count.objects.counties);
         const countyDictionary = {}
@@ -201,8 +208,6 @@
           }
         }        
   
-    d3.selectAll(".state").on("click", displayState);
-
     let colorMatrix = [ ["#C9D7DC", "#99B1D1", "#5E8CD0"],
                         ["#9CC3B6", "#73A4B4", "#4A82B3"],
                         ["#63B294", "#4E9592", "#377791"] ];
@@ -247,6 +252,20 @@
           .attr('stroke', 'black');
     // --- End legend code
   
+    d3.selectAll(".state").on("click", displayState);
+    d3.selectAll(".state").on("mouseenter", stateHover);
+    d3.selectAll(".state").on("mouseout",  stateExit);
+
+    function stateHover(){
+      let state = d3.select(this);      
+      state.attr("stroke","black")
+           .attr("stroke-width", 3);
+    }
+    function stateExit(){
+      let state = d3.select(this);
+      state.attr("stroke","none")
+          .attr("stroke-width", 0);
+    }
     function displayState() {
       let state = d3.select(this);
       let stateID = state.datum().id;
@@ -259,6 +278,8 @@
       statemap.selectAll("path.county").data(countyDictionary[stateAbr])
             .join("path")
             .attr("class","county")
+            .attr("stroke","white")
+            .attr("stroke-width", 1)
             .attr("d", path)
             .attr("fill", d => { 
                   let crimeIndex = crimeScale(countyToCrime[parseInt(d.id)]);
@@ -273,12 +294,15 @@
             });
 
       
-      d3.selectAll(".county").on("click", countyHover);
+      d3.selectAll(".county").on("click", countyClick);
+      d3.selectAll(".county").on("mouseenter", countyHover);
+      d3.selectAll(".county").on("mouseout",  countyExit);
+      
       let valueExtent = d3.extent(crime, d => d.total_crime);
       let colorScale = d3.scaleSequential(d3.interpolateViridis).domain(valueExtent)
 
       //determines what to do when you click on a county
-      function countyHover() {
+      function countyClick() {
         let county = d3.select(this);
         let fipsID = county.datum().id;
         
@@ -286,11 +310,15 @@
         console.log(fipsToCounty[parseInt(fipsID)], fipsToPop[fipsID]);
 
       // PIE CHART
+      
       var data= countyCrimeRates[parseInt(fipsID)]
       var svgCounty = d3.select("#pieChart");
+      const pieChart = d3.selectAll("svg#pieChart");
+      pieChart.selectAll("*").remove();  
       let g = svgCounty.append("g")
-              .attr("transform", "translate(200,200)");
+              .attr("transform", "translate(100,150)");
       console.log("data: " + data)
+      
           
       // Creating Pie generator
       var pie = d3.pie();
@@ -305,11 +333,11 @@
                   .enter()
                   .append("g");
       var colorScale = d3.scaleOrdinal()
-                        .domain(["murder", "rape", "robbery", "assault", "burgalry", "larceny", "motor", "arson" ])
+                        .domain(["Murder", "Rape", "Robbery", "Assault", "Burgalry", "Larceny", "Motor", "Arson" ])
                         .range(["#264653", "#2A9D8F", "#E9C46A", "#F4A261", "#E76F51", "#05668D", "#E5989B", "#4A6FA5"]);
 
       // Appending path 
-      let crimeTypes = ["murder", "rape", "robbery", "assault", "burgalry", "larceny", "motor", "arson"]
+      let crimeTypes = ["Murder", "Rape", "Robbery", "Assault", "Burgalry", "Larceny", "Motor", "Arson"]
       // let index = 0
       arcs.append("path")
           .attr("fill", (data, i)=>{
@@ -322,18 +350,58 @@
             
           })
           .attr("d", arc);
+          
+        
+
+          // Add one dot in the legend for each name.
+          svgCounty.selectAll("mydots")
+            .data(crimeTypes)
+            .enter()
+            .append("circle")
+              .attr("cx", 100)
+              .attr("cy", function(d,i){ return 100 + i*25}) // 100 is where the first dot appears. 25 is the distance between dots
+              .attr("r", 7)
+              .style("fill", function(d){ return colorScale(d)})
+              .attr("transform","translate(120,-40)")
+
+          // Add one dot in the legend for each name.
+          svgCounty.selectAll("mylabels")
+            .data(crimeTypes)
+            .enter()
+            .append("text")
+              .attr("x", 120)
+              .attr("y", function(d,i){ return 100 + i*25}) // 100 is where the first dot appears. 25 is the distance between dots
+              .style("fill", function(d){ return colorScale(d)})
+              .text(function(d){ return d})
+              .attr("text-anchor", "left")
+              .style("alignment-baseline", "middle")
+              .attr("transform","translate(120,-40)")
+       
 
       }      
+      
+      function countyHover(){
+        let county = d3.select(this);      
+        county.attr("stroke","white")
+           .attr("stroke-width", 3);
+
+      }
+
+      function countyExit(){
+        let county = d3.select(this);      
+        county.attr("stroke","white")
+           .attr("stroke-width", 1);
+      }
       d3.select("#p2").text("")
+      d3.selectAll("svg#pieChart").selectAll("*").remove();
       d3.selectAll("#p1").text(stateName + " Statistics")
       
       var barChart = d3.selectAll("svg#stateBox"),
         margin = 200,
-        width = barChart.attr("width") - margin,
-        height = barChart.attr("height") - margin
-      let bar = barChart.append("g").attr("id", "bar").attr("transform","translate("+margin+","+margin+")");
+        width = barChart.attr("width")-margin,
+        height = barChart.attr("height")-50
 
-      const stateScale = d3.scaleLinear().domain([0, 1]).range([200, width]);
+      const stateScale = d3.scaleLinear().domain([0, 1]).range([margin, width]);
       const spendingScale = d3.scaleLinear().domain([172,864]).range([height-1,0]);
       barChart.selectAll("*").remove();     
        barChart.append("line")
@@ -406,8 +474,64 @@
                           
           bottomAxis(element2);
 
+      var crimeChart = d3.selectAll("svg#crimeBox"),
+        margin = 200,
+        width2 = barChart.attr("width")-margin,
+        height2 = barChart.attr("height")-50
+      const crimeStateScale = d3.scaleLinear().domain([3452.8, 12076.5]).range([height2-1,0]);
 
-          barChart.raise()
+      crimeChart.selectAll("*").remove();     
+       crimeChart.append("line")
+                  .attr("x1",stateScale(0) )
+                  .attr("x2",stateScale(0) )
+                  .attr("y1",height2)
+                  .attr("y2",crimeStateScale(stateToCrime[stateName])) 
+                  .style("stroke", '#DC8471')
+                  .style("stroke-width", 45)
+                  .attr("fill", 'grey')
+          
+        crimeChart.append("line")
+                  .attr("x1",stateScale(1))
+                  .attr("x2",stateScale(1))
+                  .attr("y1",height2)
+                  .attr("y2",crimeStateScale(stateToCrime['United States'] )) 
+                  .style("stroke", '#DC8471')
+                  .style("stroke-width", 45)
+                  .attr("fill",'grey')
+
+        crimeChart.append("text")
+                    .attr("class", "x label")
+                    .attr("text-anchor", "middle")
+                    .attr("x", stateScale(0))
+                    .attr("y", height2 + 20)
+                    .text(stateToCode[stateName]);
+
+        crimeChart.append("text")
+                    .attr("class", "x label")
+                    .attr("text-anchor", "middle")
+                    .attr("x", stateScale(1))
+                    .attr("y", height2 + 20)
+                    .text("US");
+
+          //for each bar, create a label on top of bar with percentage for 2010
+          crimeChart.append("text")
+                  .attr("text-anchor","middle")
+                  .attr("font-size","20px")
+                  .attr("x",stateScale(0))
+                  .attr('y',crimeStateScale(stateToCrime[stateName]) - 10)
+                  .text(stateToCrime[stateName]);
+          
+          //for each bar, create a label on top of bar with percentage for 2019
+          crimeChart.append("text")
+                  .attr("text-anchor","middle")
+                  .attr("font-size","20px")
+                  .attr("x",stateScale(1))
+                  .attr('y', crimeStateScale(stateToCrime['United States'] ) - 10)
+                  .text(stateToCrime['United States']);
+
+          crimeChart.raise()
+          //barChart.raise()
+
    
    
     }
