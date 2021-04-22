@@ -26,8 +26,6 @@
         padding: 10px;
         border: 5px solid black ;
         margin: 0;
-        display: inline-block;
-
       }
       .countyBox{
         width: 350px;
@@ -35,9 +33,16 @@
         padding: 10px;
         border: 5px solid black ;
         margin: 0;
-        display: inline-block;
       }
 
+      .container{
+        margin-top: 50;
+        display:flex;
+      }
+      .infographic{
+        display:flex;
+        width: auto;
+      }
 
       .stateLabel{
         color: black;
@@ -60,24 +65,29 @@
     
     </head>
     <body>
-      <div class="container larger">    
-    
-      <svg id="usmap" height="600" width="900" style="background: #445; margin-top:50px" >
-    
-      </svg>
-    <br>
-      <svg id="statemap" height="610" width="600" style="background: #fff; margin-top:50px" >
-      </svg>
-      <div class ="stateBox">
-        <p id = "p1" class = "stateLabel"></p>
-        <svg width="300" height="225" id = "stateBox"></svg>
-        <svg width="300" height="225" id = "crimeBox"></svg>
+      <div class= "country_container">
+        <svg id="usmap" height="600" width="900" style="background: #445; margin-top:50px" >
+        </svg>
       </div>
+      
+      <div class= "container">
+        <div>
+          <svg id="statemap" height="610" width="600" style="background: #fff; margin-top:50px" >
+          </svg>
+        </div>
+        <div class="infographic">
+          <div class ="stateBox">
+            <p id = "p1" class = "stateLabel"></p>
+            <svg width="300" height="225" id = "stateBox"></svg>
+            <svg width="300" height="225" id = "crimeBox"></svg>
+          </div>
 
-      <div class ="countyBox">
-        <p id = "p2" class = "stateLabel"></p>
-        <svg id = "pieChart" width = 500 height = 500></svg>
-     </div>
+          <div class ="countyBox">
+            <p id = "p2" class = "stateLabel"></p>
+            <svg id = "pieChart" width = 500 height = 500></svg>
+          </div>
+        </div>
+      </div>
     </body>
   
     <script>
@@ -462,13 +472,13 @@
 
           let element = barChart.append("g")
                           .attr("class", "x axis")
-                          .attr("transform","translate("+(margin-height-100)+","+(margin-50)+")")
+                          .attr("transform","translate("+(margin-height-75)+","+(margin-25)+")")
                           
           bottomAxis(element);
           let bottomAxis2 = d3.axisBottom(stateScale).tickValues([]);
           let element2 = barChart.append("g")
                           .attr("class", "x axis")
-                          .attr("transform","translate("+(margin-height)+","+(margin-50)+")")
+                          .attr("transform","translate("+(margin-height+25)+","+(margin-25)+")")
                           
           bottomAxis(element2);
 
