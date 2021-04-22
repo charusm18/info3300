@@ -384,13 +384,8 @@
       arcs.append("path")
           .attr("fill", (data, i)=>{
             let value=data.data;
-<<<<<<< HEAD
             return colorScale(crimeTypes[i]);
-
             
-=======
-            return colorScale(crimeTypes[i]);            
->>>>>>> ba505e6f0f8ac11c76dde7074fbd22e9ca75030e
           })
           .attr("d", arc)
           .attr("dataVal", d=> d.data)
