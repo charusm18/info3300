@@ -26,8 +26,6 @@
         padding: 10px;
         border: 5px solid black ;
         margin: 0;
-        display: inline-block;
-
       }
       .countyBox{
         width: 350px;
@@ -35,9 +33,16 @@
         padding: 10px;
         border: 5px solid black ;
         margin: 0;
-        display: inline-block;
       }
 
+      .container{
+        margin-top: 50;
+        display:flex;
+      }
+      .infographic{
+        display:flex;
+        width: auto;
+      }
 
       .stateLabel{
         color: black;
@@ -60,24 +65,29 @@
     
     </head>
     <body>
-      <div class="container larger">    
-    
-      <svg id="usmap" height="600" width="900" style="background: #264653; margin-top:50px" >
-    
-      </svg>
-    <br>
-      <svg id="statemap" height="610" width="600" style="background: #fff; margin-top:50px" >
-      </svg>
-      <div class ="stateBox" id = "stateDiv">
-        <p id = "p1" class = "stateLabel"></p>
-        <svg width="300" height="225" id = "stateBox"></svg>
-        <svg width="300" height="225" id = "crimeBox"></svg>
+      <div class= "country_container">
+        <svg id="usmap" height="600" width="900" style="background: #264653; margin-top:50px" >
+        </svg>
       </div>
+      
+      <div class= "container">
+        <div>
+          <svg id="statemap" height="610" width="600" style="background: #fff; margin-top:50px" >
+          </svg>
+        </div>
+        <div class="infographic">
+          <div class ="stateBox">
+            <p id = "p1" class = "stateLabel"></p>
+            <svg width="300" height="225" id = "stateBox"></svg>
+            <svg width="300" height="225" id = "crimeBox"></svg>
+          </div>
 
-      <div class ="countyBox">
-        <p id = "p2" class = "stateLabel"></p>
-        <svg id = "pieChart" width = 500 height = 500></svg>
-     </div>
+          <div class ="countyBox">
+            <p id = "p2" class = "stateLabel"></p>
+            <svg id = "pieChart" width = 500 height = 500></svg>
+          </div>
+        </div>
+      </div>
     </body>
   
     <script>
@@ -313,7 +323,6 @@
       pieChart.selectAll("*").remove();  
       let g = svgCounty.append("g")
               .attr("transform", "translate(100,150)");
-      console.log("data: " + data)
       if(data == undefined){
         pieChart.append("text")
                     .attr("class", "x label")
@@ -346,8 +355,6 @@
           .attr("fill", (data, i)=>{
             console.log("i: " + i)
             let value=data.data;
-            console.log("one step before: " + crimeTypes[i])
-            console.log("color: " + colorScale[crimeTypes[i]])
             return colorScale(crimeTypes[i]);
 
             
@@ -474,13 +481,13 @@
 
           let element = barChart.append("g")
                           .attr("class", "x axis")
-                          .attr("transform","translate("+(margin-height-100)+","+(margin-50)+")")
+                          .attr("transform","translate("+(margin-height-75)+","+(margin-25)+")")
                           
           bottomAxis(element);
           let bottomAxis2 = d3.axisBottom(stateScale).tickValues([]);
           let element2 = barChart.append("g")
                           .attr("class", "x axis")
-                          .attr("transform","translate("+(margin-height)+","+(margin-50)+")")
+                          .attr("transform","translate("+(margin-height+25)+","+(margin-25)+")")
                           
           bottomAxis(element2);
 
@@ -543,7 +550,29 @@
                   .attr("font-size","20px")
                   .attr("x",stateScale(1))
                   .attr('y', crimeStateScale(stateToCrime['United States'] ) - 10)
-                  .text(stateToCrime['United States']);   
+                  .text(stateToCrime['United States']);  
+                  
+        let leftAxis2 = d3.axisLeft(crimeStateScale).ticks(3).tickSizeOuter(0);
+                  crimeChart.append("g")
+            .attr("class", "y axis")
+            .attr("transform","translate("+(margin-width-50)+","+(margin-width-100)+")") 
+            .call(leftAxis2);
+
+          let bottomAxis3 = d3.axisBottom(stateScale).tickValues([])
+                            .tickSizeOuter(0)
+          // d3.barChart.axis().outerTickSize(0);
+
+          let element1 = crimeChart.append("g")
+                          .attr("class", "x axis")
+                          .attr("transform","translate("+(margin-height-75)+","+(margin-25)+")")
+                          
+          bottomAxis3(element1);
+          let bottomAxis4 = d3.axisBottom(stateScale).tickValues([]);
+          let element3 = crimeChart.append("g")
+                          .attr("class", "x axis")
+                          .attr("transform","translate("+(margin-height+25)+","+(margin-25)+")")
+                          
+          bottomAxis(element3);
 
     }
     
