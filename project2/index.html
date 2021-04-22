@@ -208,8 +208,6 @@
           }
         }        
   
-    d3.selectAll(".state").on("click", displayState);
-
     let colorMatrix = [ ["#C9D7DC", "#99B1D1", "#5E8CD0"],
                         ["#9CC3B6", "#73A4B4", "#4A82B3"],
                         ["#63B294", "#4E9592", "#377791"] ];
@@ -254,7 +252,20 @@
           .attr('stroke', 'black');
     // --- End legend code
   
-  
+    d3.selectAll(".state").on("click", displayState);
+    d3.selectAll(".state").on("mouseenter", stateHover);
+    d3.selectAll(".state").on("mouseout",  stateExit);
+
+    function stateHover(){
+      let state = d3.select(this);      
+      state.attr("stroke","black")
+           .attr("stroke-width", 3);
+    }
+    function stateExit(){
+      let state = d3.select(this);
+      state.attr("stroke","none")
+          .attr("stroke-width", 0);
+    }
     function displayState() {
       let state = d3.select(this);
       let stateID = state.datum().id;
@@ -267,6 +278,8 @@
       statemap.selectAll("path.county").data(countyDictionary[stateAbr])
             .join("path")
             .attr("class","county")
+            .attr("stroke","white")
+            .attr("stroke-width", 1)
             .attr("d", path)
             .attr("fill", d => { 
                   let crimeIndex = crimeScale(countyToCrime[parseInt(d.id)]);
@@ -281,12 +294,15 @@
             });
 
       
-      d3.selectAll(".county").on("click", countyHover);
+      d3.selectAll(".county").on("click", countyClick);
+      d3.selectAll(".county").on("mouseenter", countyHover);
+      d3.selectAll(".county").on("mouseout",  countyExit);
+      
       let valueExtent = d3.extent(crime, d => d.total_crime);
       let colorScale = d3.scaleSequential(d3.interpolateViridis).domain(valueExtent)
 
       //determines what to do when you click on a county
-      function countyHover() {
+      function countyClick() {
         let county = d3.select(this);
         let fipsID = county.datum().id;
         
@@ -363,6 +379,19 @@
        
 
       }      
+      
+      function countyHover(){
+        let county = d3.select(this);      
+        county.attr("stroke","white")
+           .attr("stroke-width", 3);
+
+      }
+
+      function countyExit(){
+        let county = d3.select(this);      
+        county.attr("stroke","white")
+           .attr("stroke-width", 1);
+      }
       d3.select("#p2").text("")
       d3.selectAll("svg#pieChart").selectAll("*").remove();
       d3.selectAll("#p1").text(stateName + " Statistics")
