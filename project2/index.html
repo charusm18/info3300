@@ -301,7 +301,7 @@
       pieChart.selectAll("*").remove();  
       let g = svgCounty.append("g")
               .attr("transform", "translate(100,150)");
-      console.log("data: " + data)
+      // console.log("data: " + data)
       
           
       // Creating Pie generator
@@ -315,25 +315,76 @@
       var arcs = g.selectAll("arc")
                   .data(pie(data))
                   .enter()
-                  .append("g");
+                  .append("g")
+                  .attr("dataVal", console.log(pie(data)));
       var colorScale = d3.scaleOrdinal()
                         .domain(["Murder", "Rape", "Robbery", "Assault", "Burgalry", "Larceny", "Motor", "Arson" ])
                         .range(["#264653", "#2A9D8F", "#E9C46A", "#F4A261", "#E76F51", "#05668D", "#E5989B", "#4A6FA5"]);
 
+      var div = d3.select("body").append("div")
+          .attr("class", "tooltip-donut")
+          .style("opacity", 0);
+      
       // Appending path 
       let crimeTypes = ["Murder", "Rape", "Robbery", "Assault", "Burgalry", "Larceny", "Motor", "Arson"]
-      // let index = 0
+
+      let tooltipWidth = 120;
+      let tooltipHeight = 40;
+      let tooltip = d3.select("#pieChart").append("g")
+                     .attr("class","tooltip")
+                     .attr("visibility","hidden");
+      tooltip.append("rect")
+              .attr("fill", "#56a0bf")
+              .attr("opacity", 0.9)
+              .attr("x", -tooltipWidth / 2.0)
+              .attr("y", 0)
+              .attr("width",tooltipWidth)
+              .attr("height",tooltipHeight)
+      let txt = tooltip.append("text")
+                     .attr("fill", "black")
+                     .attr("text-anchor","middle")
+                     .attr("alignment-baseline","hanging")
+                     .attr("x", 0)
+                     .attr("y", 10);
+     
+
+      let momesh =  d3.select("#pieChart").append("path")
+                        .attr("class","mouseover outline")
+                        .attr("d", "");
+
+    
       arcs.append("path")
           .attr("fill", (data, i)=>{
-            console.log("i: " + i)
             let value=data.data;
-            console.log("one step before: " + crimeTypes[i])
-            console.log("color: " + colorScale[crimeTypes[i]])
-            return colorScale(crimeTypes[i]);
-
-            
+            return colorScale(crimeTypes[i]);            
           })
-          .attr("d", arc);
+          .attr("d", arc)
+          .attr("dataVal", d=> d.data)
+          .on("mouseenter", mouseEntersPlot)
+          .on("mouseout",  mouseLeavesPlot);
+
+      function mouseEntersPlot() {
+    
+      tooltip.style("visibility","visible")
+  
+  
+      let arc = d3.select(this);
+      // console.log(arc.datum())
+      txt.text(d3.format(".1%")(arc.datum().dataVal));
+  
+      tooltip.attr("transform","translate(100,255)");
+
+    }
+
+        function mouseLeavesPlot() {
+  
+        // Hide when you leave a state
+        tooltip.style("visibility","hidden");
+
+        let arc = d3.select(this);
+        
+        momesh.attr("d", "");
+      }
           
         
 
@@ -360,8 +411,8 @@
               .attr("text-anchor", "left")
               .style("alignment-baseline", "middle")
               .attr("transform","translate(120,-40)")
-       
 
+            
       }      
       d3.select("#p2").text("")
       d3.selectAll("svg#pieChart").selectAll("*").remove();
