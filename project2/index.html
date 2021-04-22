@@ -84,7 +84,8 @@
 
           <div class ="countyBox">
             <p id = "p2" class = "stateLabel"></p>
-            <svg id = "pieChart" width = 500 height = 500></svg>
+            <svg id = "pieChart" width = 400 height = 400 ></svg>
+            <svg id = "ratio" width = 200 height = 200></svg>
           </div>
         </div>
       </div>
@@ -442,8 +443,13 @@
               .attr("transform","translate(120,-40)")
 
       }
+      var svgRatio = d3.selectAll("#ratio");
+      svgRatio.append("text")
+              .text(countyToPolice[(fipsID)])
+              .attr("x", 120)
+              .attr("y", 200)
+              .attr("text-anchor", "middle")
       
-          
       
 
       }      
