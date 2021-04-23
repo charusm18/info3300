@@ -76,7 +76,7 @@
           </svg>
         </div>
         <div class="infographic">
-          <div class ="stateBox">
+          <div class ="stateBox" id = "stateDiv">
             <p id = "p1" class = "stateLabel"></p>
             <svg width="300" height="225" id = "stateBox"></svg>
             <svg width="300" height="225" id = "crimeBox"></svg>
@@ -473,7 +473,8 @@
 
       const stateScale = d3.scaleLinear().domain([0, 1]).range([margin, width]);
       const spendingScale = d3.scaleLinear().domain([172,864]).range([height-1,0]);
-      barChart.selectAll("*").remove();     
+      barChart.selectAll("*").remove();   
+
       barChart.append("line")
                   .attr("x1",stateScale(0) )
                   .attr("x2",stateScale(0) )
@@ -543,14 +544,18 @@
                           .attr("transform","translate("+(margin-height+25)+","+(margin-25)+")")
                           
           bottomAxis(element2);
-
-
+        if(stateToSpending[stateName] > stateToSpending["United States"]){          
+          var barChartText = stateName + " spends $"+ stateToSpending[stateName] + "K a year on police spending, \n which is $"+ (stateToSpending[stateName]- stateToSpending["United States"]) + " more than the national average"
+        }        
+        else{          
+            var barChartText = stateName + " spends $"+ stateToSpending[stateName] + "K a year on police spending, \n which is $"+ (stateToSpending["United States"]- stateToSpending[stateName]) + " less than the national average"
+        }
           d3.selectAll("#stateDiv").append("text")
                     .attr("class", "x label")
                     .attr("text-anchor", "middle")
                     .attr("x",170)
                     .attr("y",200)
-                    .text(stateName + " spends $"+ stateToSpending[stateName] + "K a year on police spending, \n which is "+ "34" + "more than the national average");
+                    .text(barChartText);
 
       var crimeChart = d3.selectAll("svg#crimeBox"),
         margin = 200,
