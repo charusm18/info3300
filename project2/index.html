@@ -50,6 +50,12 @@
         font-weight: bold;
         margin: 0;
       }
+      .ratio{
+        color: black;
+        font-size:180%;
+        font-weight: bold;
+        margin: 0;
+      }
 
       .nation {
     fill: #ddd;
@@ -82,10 +88,10 @@
             <svg width="300" height="225" id = "crimeBox"></svg>
           </div>
 
-          <div class ="countyBox">
+          <div id = "county" class ="countyBox">
             <p id = "p2" class = "stateLabel"></p>
-            <svg id = "pieChart" width = 400 height = 400 ></svg>
-            <svg id = "ratio" width = 200 height = 200></svg>
+            <svg id = "pieChart" width = 400 height = 250 ></svg>
+            <svg id = "ratio" width = 500 height = 200 ></svg>
           </div>
         </div>
       </div>
@@ -443,13 +449,28 @@
               .attr("transform","translate(120,-40)")
 
       }
+      d3.selectAll("svg#ratio").selectAll("*").remove();
       var svgRatio = d3.selectAll("#ratio");
-      svgRatio.append("text")
-              .text(countyToPolice[(fipsID)])
+      if(countyToPolice[(fipsID)] == undefined){
+        svgRatio.append("text")
+                    .text("This county did not report any crime data for 2016")
+                    .attr("x",20)
+                    .attr("y",96);
+      }
+      else{
+        svgRatio.append("text")
+              .text(d3.format(".1f")(countyToPolice[(fipsID)] * 1000) + " : 1000")
               .attr("x", 120)
-              .attr("y", 200)
+              .attr("y", 100)
               .attr("text-anchor", "middle")
-      
+              .attr("class", "ratio")
+
+        svgRatio.append("text")
+              .text("police to civilian ratio")
+              .attr("x",185)
+              .attr("y",96)
+      }
+
       
 
       }      
