@@ -29,20 +29,19 @@
       }
       #p1{
         font-family: dmsans-bold;
-        margin-top: 10px;
         margin-bottom: 20px;
         text-align: center;
         color: #2C7E7E;
       }
       #p2{
         font-family: dmsans-bold;
-        margin-top: 10px;
         margin-bottom: 20px;
         text-align: center;
         color: #2C7E7E;
       }
       #stateBox{
         font-family: dmsans-regular;
+        margin-left: 30px;
       }
       #stateText{
         color: #2C7E7E;
@@ -76,6 +75,8 @@
       }
       #crimeBox{
         font-family: dmsans-regular;
+        margin-top: 10px;
+        margin-left: 30px;
       }
       .legend{
         font-family: dmsans-regular;
@@ -101,16 +102,16 @@
       .stateBox{
         width: 350px;
         height: 600px;
-        padding: 10px;
-        border: 2px solid #2C7E7E ;
+        padding: 30px;
+        border: 3px solid #2C7E7E ;
         border-right:none;
         margin: 0;
       }
       .countyBox{
         width: 350px;
         height: 600px;
-        padding: 10px;
-        border: 2px solid #2C7E7E ;
+        padding: 30px;
+        border: 3px solid #2C7E7E ;
         border-left: none;
         background-image: linear-gradient(to bottom, #2C7E7E 20%, rgba(255, 255, 255, 0) 0%);
         background-position: left;
@@ -145,9 +146,16 @@
       }
 
       .nation {
-    fill: #ddd;
-  }
+        fill: #ddd;
+      }
 
+      .story{
+        text-align:center;
+        margin: auto;
+        width: 50%;
+        font-family: dmsans-regular;
+
+      }
   .directions{
     text-align:center; 
     font-family: dmsans-regular;
@@ -158,21 +166,24 @@
   }
  
 
-  /* .outline {
-    stroke: #fff;
-    stroke-width: 1px;
-    fill: none;
-  } */
-    
       </style>
     
     <!-- Container for the entire US map -->
     </head>
     <body>
       <div class= "country_container">
-        <p class = "directions">
-          Press on a state to see its overall police and crime data 
-        </p>
+        <h1 class = "directions">Policing and Crime in 2016</h1>
+        <p class = "story"> Across the United States, there are varying levels of crime and policing across 
+          different counties. Our project aimed to determine whether there is a correlation
+          between the number of law enforcement in a county and the amount of criminal 
+          activity ocurring in that region. Our hypothesis was that a higher number of 
+          police officers in a state would result in lower reported crime. We were also 
+          interested in seeing the correlation between government spending on law enforcement
+          and crime rates, the assumption being that more spending would result in less crime. 
+        </p> <br>
+        <h3 class = "directions">
+          Click on a state and scroll down to see its overall police and crime data
+        </h3>
         <svg id="usmap" height="500" width="900" style="background: #264653; margin:auto; display: block" >
         </svg>
       </div>
@@ -206,7 +217,17 @@
           </div>
           
         </div>
+        
       </div>
+      <p class = "story"> After looking through the data, we realized that our original assumptions that more police
+        results in lower crime rates was incorrect. We found that it heavily depended on which state we were looking at.
+        In many states, there were counties that indicated a high policing rate and more crime, but in other states
+        there was little to no relationship between the policing rate and crime rate. After doing some research with external
+        sources, we found that more policing does not necessarily lead to a reduction in crime. It does not always lead to an
+        increase in crime, but that is often the case in many states.  
+      </p> <br>
+      <h3 class = "directions"> Charu Murugesan (csm246), Ishika Jain (ij36), Cristie Huang (ch746)</h3>
+     
     </body>
   
     <script>
@@ -237,7 +258,7 @@
 
 
         const count = await d3.json("../counties-10m.json");
-        const us = await d3.json("../us-smaller.json");
+        const us = await d3.json("../us-smaller.json")
 
         const stateNames = await d3.tsv("../us-state-names.tsv");
 
@@ -250,7 +271,8 @@
            .join("path")
            .attr("class", "state")
            .attr("note", d => d.id)
-           .attr("d", path);
+           .attr("d", path)
+
       
         map.append("path").datum(statesMesh)
            .attr("class","outline")
@@ -590,12 +612,16 @@
                 .attr("y", 100)
                 .attr("text-anchor", "middle")
                 .attr("class", "ratio")
+                .style("fill", "#2C7E7E")
+                .style("font-size", "35px");
 
         svgRatio.append("text")
                 .text("police to civilian ratio")
                 .attr("x",170)
                 .attr("y",96)
+                .style("font-size", "14px")
                 .attr("font-family", "dmsans-regular")
+                .style("fill", "#535353");
 
       }
       
@@ -609,36 +635,45 @@
         crimeRatio.append("text")
                 .text("This county did not report any crime data for 2016.")
                 .attr("x",20)
-                .attr("y",96)
+                .attr("y",90)
                 .style("font-size", "14px");
       }
       // if there's crime data, the crime ratio is displayed 
       else{
         crimeRatio.append("text")
                 .text(countyToCrime[(parseInt(fipsID))])
-                .attr("x", 60)
-                .attr("y", 100)
-                .attr("text-anchor", "middle")
+                .attr("x", 90)
+                .attr("y", 90)
+                .attr("text-anchor", "end")
                 .attr("class", "ratio")
+                .style("fill", "#2C7E7E")
+
+        
+                .style("font-size", "160%")
 
         crimeRatio.append("text")
                 .text("crimes per ")
-                .attr("x",100)
-                .attr("y",96)
+                .attr("x",95)
+                .attr("y",87)
                 .attr("font-family", "dmsans-regular")
 
       crimeRatio.append("text")
                 .text("100,000")
                 .attr("x",180)
-                .attr("y",100)
+                .attr("y",90)
                 .attr("class", "ratio")
+                .style("font-size", "160%")
+
                 
 
       crimeRatio.append("text")
                 .text("residents")
-                .attr("x",280)
-                .attr("y",96)
+                .attr("x",287)
+                .attr("y",87)
                 .attr("font-family", "dmsans-regular")
+                .style("font-size", "14px")
+                .style("fill", "#535353");
+              
       }
      
 
@@ -731,12 +766,12 @@
     let bottomAxis = d3.axisBottom(stateScale).tickValues([]).tickSizeOuter(0)
     let element = barChart.append("g")
                           .attr("class", "x axis")
-                          .attr("transform","translate("+(margin-height-75)+","+(margin-25)+")")                  
+                          .attr("transform","translate("+(margin-height-100)+","+(margin-50)+")")                  
     bottomAxis(element);
     let bottomAxis2 = d3.axisBottom(stateScale).tickValues([]);
     let element2 = barChart.append("g")
                            .attr("class", "x axis")
-                           .attr("transform","translate("+(margin-height+25)+","+(margin-25)+")")
+                           .attr("transform","translate("+(margin-height)+","+(margin-50)+")")
                           
     bottomAxis(element2);
     if(stateToSpending[stateName] > stateToSpending["United States"]){          
@@ -753,7 +788,7 @@
     var crimeChart = d3.selectAll("svg#crimeBox"),
         margin = 200,
         width2 = barChart.attr("width")-margin,
-        height2 = barChart.attr("height")-50
+        height2 = barChart.attr("height")-45
     const crimeStateScale = d3.scaleLinear().domain([3452.8, 12076.5]).range([height2-1,0]);
 
     crimeChart.selectAll("*").remove();     
@@ -806,18 +841,18 @@
     let leftAxis2 = d3.axisLeft(crimeStateScale).ticks(3).tickSizeOuter(0);
     crimeChart.append("g")
               .attr("class", "y axis")
-              .attr("transform","translate("+(margin-width-50)+","+(margin-width-100)+")") 
+              .attr("transform","translate("+(margin-width-50)+","+(margin-width-95)+")") 
               .call(leftAxis2);
 
     let bottomAxis3 = d3.axisBottom(stateScale).tickValues([]).tickSizeOuter(0)
     let element1 = crimeChart.append("g")
                               .attr("class", "x axis")
-                              .attr("transform","translate("+(margin-height-75)+","+(margin-25)+")")                   
+                              .attr("transform","translate("+(margin-height-100)+","+(margin-50)+")")                   
     bottomAxis3(element1);
     let bottomAxis4 = d3.axisBottom(stateScale).tickValues([]);
     let element3 = crimeChart.append("g")
                               .attr("class", "x axis")
-                              .attr("transform","translate("+(margin-height+25)+","+(margin-25)+")")
+                              .attr("transform","translate("+(margin-height)+","+(margin-50)+")")
                           
     bottomAxis(element3);
 
