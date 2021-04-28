@@ -565,8 +565,12 @@
                           .duration('50')
                           .style("opacity", 0);
                 });
-
-
+    
+    let legend = ["Murder", "Rape", "Robbery", "Assault", "Burgalry", "Larceny", "Motor Theft", "Arson"]
+    var colorScaleLegend = d3.scaleOrdinal()
+                        .domain(["Murder", "Rape", "Robbery", "Assault", "Burgalry", "Larceny", "Motor Theft", "Arson" ])
+                        .range(["#264653", "#2A9D8F", "#E9C46A", "#F4A261", "#E76F51", "#05668D", "#E5989B", "#7D80BB"]);
+                        
     // creates dots for legends next to pie chart
     svgCounty.selectAll("mydots")
               .data(crimeTypes)
@@ -580,12 +584,12 @@
 
     // creates labels for each corresponding dot in legend
     svgCounty.selectAll("mylabels")
-            .data(crimeTypes)
+            .data(legend)
             .enter()
             .append("text")
             .attr("x", 120)
             .attr("y", function(d,i){ return 100 + i*25}) // 100 is where the first dot appears. 25 is the distance between dots
-            .style("fill", function(d){ return colorScale(d)})
+            .style("fill", function(d){ return colorScaleLegend(d)})
             .text(function(d){ return d})
             .attr("text-anchor", "left")
             .style("alignment-baseline", "middle")
