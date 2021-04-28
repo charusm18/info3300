@@ -1,10 +1,43 @@
 
 <html><head>
     
-      <link href="https://fonts.googleapis.com/css?family=Lato:400,700|Raleway:400,700" rel="stylesheet">
       <script src="https://d3js.org/d3.v6.min.js"></script>
       <script src="https://d3js.org/topojson.v2.min.js"></script>
       <style>
+
+      @font-face {
+        font-family: dmsans-regular;
+        src: url('/font/DMSans-Regular.ttf');
+      }
+      @font-face {
+        font-family: dmsans-bold;
+        src: url('/font/DMSans-Bold.ttf');
+      }
+      #p1{
+        font-family: dmsans-bold;
+        margin-top: 10px;
+        margin-bottom: 20px;
+        text-align: center;
+      }
+      #p2{
+        font-family: dmsans-bold;
+        margin-top: 10px;
+        margin-bottom: 20px;
+        text-align: center;
+      }
+      #stateBox{
+        font-family: dmsans-regular;
+      }
+      #countyBox{
+        font-family: dmsans-regular;
+      }
+      #crimeBox{
+        font-family: dmsans-regular;
+      }
+      #pieChart{
+        font-family: dmsans-regular;
+        
+      }
     
       .state {
         fill: lightgrey;
@@ -34,7 +67,9 @@
         border: 5px solid black ;
         margin: 0;
       }
-
+      .state_container{
+        margin-left: 40px;
+      }
       .container{
         margin-top: 50;
         display:flex;
@@ -86,7 +121,7 @@
       
       
       <div class= "container">
-        <div>
+        <div class="state_container">
           <p id = "countyText"  class = "directions"> The county map will be shown below when a state is selected.</p>
           <svg id="statemap" height="610" width="600" style="background: #fff; margin-top:50px" >
           </svg>
@@ -371,7 +406,7 @@
                   .attr("dataVal", console.log(pie(data)));
       var colorScale = d3.scaleOrdinal()
                         .domain(["Murder", "Rape", "Robbery", "Assault", "Burgalry", "Larceny", "Motor", "Arson" ])
-                        .range(["#264653", "#2A9D8F", "#E9C46A", "#F4A261", "#E76F51", "#05668D", "#E5989B", "#4A6FA5"]);
+                        .range(["#264653", "#2A9D8F", "#E9C46A", "#F4A261", "#E76F51", "#05668D", "#E5989B", "#7D80BB"]);
 
       var div = d3.select("body").append("div")
           .attr("class", "tooltip-donut")
