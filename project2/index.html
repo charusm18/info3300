@@ -108,19 +108,37 @@
       .nation {
     fill: #ddd;
   }
+
+  .directions{
+    text-align:center; 
+  }
+ 
+
+  /* .outline {
+    stroke: #fff;
+    stroke-width: 1px;
+    fill: none;
+  } */
+    
       </style>
     
     </head>
     <body>
       <div class= "country_container">
+        <p class = "directions">
+          Press on a state to see its overall police and crime data 
+        </p>
         <svg id="usmap" height="500" width="900" style="background: #264653; margin:auto; display: block" >
         </svg>
       </div>
       
+      
       <div class= "container">
         <div class="state_container">
+          <p id = "countyText"  class = "directions"> The county map will be shown below when a state is selected.</p>
           <svg id="statemap" height="610" width="600" style="background: #fff; margin-top:50px" >
           </svg>
+          
         </div>
         <div class="infographic">
           <div class ="stateBox" id = "stateDiv">
@@ -138,6 +156,7 @@
             <svg id = "crimeRatio" width = 500 height = 200 ></svg>
 
           </div>
+          
         </div>
       </div>
     </body>
@@ -350,7 +369,7 @@
                   }
             });
 
-      
+      d3.select("#countyText").text("Select a county to view its county specific police and crime data")
       d3.selectAll(".county").on("click", countyClick);
       d3.selectAll(".county").on("mouseenter", countyHover);
       d3.selectAll(".county").on("mouseout",  countyExit);
@@ -461,7 +480,7 @@
       }
 
       d3.selectAll("svg#ratio").selectAll("*").remove();
-      var svgRatio = d3.selectAll("#ratio");
+      const svgRatio = d3.selectAll("#ratio");
       if(countyToPolice[parseInt(fipsID)] == undefined){
         svgRatio.append("text")
                 .text("This county did not report any police data for 2016")
@@ -470,7 +489,7 @@
       }
       else{
         svgRatio.append("text")
-                .text(d3.format(".1f")(countyToPolice[(parseInt(fipsID))] * 1000) + " : 1000")
+                .text(d3.format(".0f")(countyToPolice[(parseInt(fipsID))] * 1000) + " : 1000")
                 .attr("x", 100)
                 .attr("y", 100)
                 .attr("text-anchor", "middle")
@@ -481,8 +500,11 @@
                 .attr("x",170)
                 .attr("y",96)
       }
+      
+
       d3.selectAll("svg#crimeRatio").selectAll("*").remove();
       var crimeRatio = d3.selectAll("#crimeRatio");
+      
       if(countyToCrime[parseInt(fipsID)] == undefined){
         crimeRatio.append("text")
                 .text("This county did not report any crime data for 2016")
@@ -499,20 +521,21 @@
 
         crimeRatio.append("text")
                 .text("crimes per ")
-                .attr("x",90)
+                .attr("x",100)
                 .attr("y",96)
 
       crimeRatio.append("text")
                 .text("100,000")
-                .attr("x",160)
+                .attr("x",170)
                 .attr("y",100)
                 .attr("class", "ratio")
 
       crimeRatio.append("text")
                 .text("residents")
-                .attr("x",260)
+                .attr("x",270)
                 .attr("y",96)
       }
+     
 
     }      
       
@@ -532,6 +555,8 @@
       
     d3.select("#p2").text("")
     d3.selectAll("svg#pieChart").selectAll("*").remove();
+    d3.selectAll("svg#ratio").selectAll("*").remove();
+    d3.selectAll("svg#crimeRatio").selectAll("*").remove();
     d3.selectAll("#p1").text(stateName + " Statistics")
       
     var barChart = d3.selectAll("svg#stateBox"),
