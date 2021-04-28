@@ -1,7 +1,7 @@
 
-<html><head>
+<html>
+  <head>
     
-      <link href="https://fonts.googleapis.com/css?family=Lato:400,700|Raleway:400,700" rel="stylesheet">
       <script src="https://d3js.org/d3.v6.min.js"></script>
       <script src="https://d3js.org/topojson.v2.min.js"></script>
       <style>
@@ -18,6 +18,40 @@
           font-size: 1.3rem;
       }
           
+      @font-face {
+        font-family: dmsans-regular;
+        src: url('/font/DMSans-Regular.ttf');
+      }
+      @font-face {
+        font-family: dmsans-bold;
+        src: url('/font/DMSans-Bold.ttf');
+      }
+      #p1{
+        font-family: dmsans-bold;
+        margin-top: 10px;
+        margin-bottom: 20px;
+        text-align: center;
+      }
+      #p2{
+        font-family: dmsans-bold;
+        margin-top: 10px;
+        margin-bottom: 20px;
+        text-align: center;
+      }
+      #stateBox{
+        font-family: dmsans-regular;
+      }
+      #countyBox{
+        font-family: dmsans-regular;
+      }
+      #crimeBox{
+        font-family: dmsans-regular;
+      }
+      #pieChart{
+        font-family: dmsans-regular;
+        
+      }
+    
       .state {
         fill: lightgrey;
       }
@@ -46,7 +80,9 @@
         border: 5px solid black ;
         margin: 0;
       }
-
+      .state_container{
+        margin-left: 40px;
+      }
       .container{
         margin-top: 50;
         display:flex;
@@ -72,7 +108,7 @@
       .nation {
     fill: #ddd;
   }
-  </style>
+      </style>
     
     </head>
     <body>
@@ -82,7 +118,7 @@
       </div>
       
       <div class= "container">
-        <div>
+        <div class="state_container">
           <svg id="statemap" height="610" width="600" style="background: #fff; margin-top:50px" >
           </svg>
         </div>
@@ -328,13 +364,12 @@
         let fipsID = county.datum().id;
         
         d3.select("#p2").text(fipsToCounty[parseInt(fipsID)])
-        console.log(fipsToCounty[parseInt(fipsID)], fipsToPop[fipsID]);
-
+        
       // PIE CHART
-      
       var data= countyCrimeRates[parseInt(fipsID)]
       var svgCounty = d3.select("#pieChart");
       const pieChart = d3.selectAll("svg#pieChart");
+      
       pieChart.selectAll("*").remove();  
       let g = svgCounty.append("g")
               .attr("transform", "translate(100,150)");
@@ -347,9 +382,8 @@
                     .text("This county did not report any crime data for 2016");
       }
       else{
-        // Creating Pie generator
-      var pie = d3.pie();
-      // Creating arc
+      var pie = d3.pie()
+
       var arc = d3.arc()
                   .innerRadius(0)
                   .outerRadius(100);
@@ -359,94 +393,50 @@
                   .data(pie(data))
                   .enter()
                   .append("g")
-                  .attr("dataVal", console.log(pie(data)))
-                  .on('mouseover', function (d, i) {
-          d3.select(this).transition()
-               .duration('50')
-               .attr('opacity', '.85');
-          div.transition()
-               .duration(50)
-               .style("opacity", 1);
-          let num = (100).toString() + '%';
-          div.html(num)
-               .style("left", (d.pageX + 10) + "px")
-               .style("top", (d.pageY - 15) + "px");
-     })
-     .on('mouseout', function (d, i) {
-          d3.select(this).transition()
-               .duration('50')
-               .attr('opacity', '1');
-          div.transition()
-               .duration('50')
-               .style("opacity", 0);
-     });
-      
-     
-     var colorScale = d3.scaleOrdinal()
-                        .domain(["Murder", "Rape", "Robbery", "Assault", "Burgalry", "Larceny", "Motor", "Arson" ])
-                        .range(["#264653", "#2A9D8F", "#E9C46A", "#F4A261", "#E76F51", "#05668D", "#E5989B", "#4A6FA5"]);
+                  .attr("dataVal", data)
 
+   
       var div = d3.select("body").append("div")
-          .attr("class", "tooltip-donut")
+          .attr("class", "tooltip")
           .style("opacity", 0);
       
-      // Appending path 
       let crimeTypes = ["Murder", "Rape", "Robbery", "Assault", "Burgalry", "Larceny", "Motor", "Arson"]
-
-      let tooltipWidth = 120;
-      let tooltipHeight = 40;
-      let tooltip = d3.select("#pieChart").append("g")
-                     .attr("class","tooltip")
-                     .attr("visibility","hidden");
-      tooltip.append("rect")
-              .attr("fill", "#56a0bf")
-              .attr("opacity", 0.9)
-              .attr("x", -tooltipWidth / 2.0)
-              .attr("y", 0)
-              .attr("width",tooltipWidth)
-              .attr("height",tooltipHeight)
-      let txt = tooltip.append("text")
-                     .attr("fill", "black")
-                     .attr("text-anchor","middle")
-                     .attr("alignment-baseline","hanging")
-                     .attr("x", 0)
-                     .attr("y", 10);
-     
-
-      let momesh =  d3.select("#pieChart").append("path")
-                        .attr("class","mouseover outline")
-                        .attr("d", "");
+      var colorScale = d3.scaleOrdinal()
+                        .domain(["Murder", "Rape", "Robbery", "Assault", "Burgalry", "Larceny", "Motor", "Arson" ])
+                        .range(["#264653", "#2A9D8F", "#E9C46A", "#F4A261", "#E76F51", "#05668D", "#E5989B", "#7D80BB"]);
 
     
       arcs.append("path")
           .attr("fill", (data, i)=>{
             let value=data.data;
             return colorScale(crimeTypes[i]);
-            
           })
           .attr("d", arc)
           .attr("dataVal", d=> d.data)
-          .on("mouseenter", mouseEntersPlot)
-          .on("mouseout",  mouseLeavesPlot);
+          .on('mouseover', function (d, i) {
+                      d3.select(this).transition()
+                                      .duration('50')
+                                      .attr('opacity', '.85');
+                      div.transition()
+                          .duration(50)
+                          .style("opacity", 1);
+                      console.log(d3.select(this).datum().data)
+                      let num = (d3.format(".1f")(d3.select(this).datum().data*200)).toString() + '%';
+                      div.html(num)
+                          .style("left", (d.pageX + 10) + "px")
+                          .style("top", (d.pageY - 15) + "px");
+                })
+                .on('mouseout', function (d, i) {
+                      d3.select(this).transition()
+                          .duration('50')
+                          .attr('opacity', '1');
+                      div.transition()
+                          .duration('50')
+                          .style("opacity", 0);
+                });
 
-    function mouseEntersPlot() {
-    
-        tooltip.style("visibility","visible")
-    
-    
-        let arc = d3.select(this);
-        // console.log(arc.datum())
-        txt.text(d3.format(".1%")(arc.datum().dataVal));
-        tooltip.attr("transform","translate(100,255)");
 
-    }
-
-    function mouseLeavesPlot() {
-        tooltip.style("visibility","hidden");
-        let arc = d3.select(this);
-        momesh.attr("d", "");
-    }
-          
+    
     svgCounty.selectAll("mydots")
               .data(crimeTypes)
               .enter()
