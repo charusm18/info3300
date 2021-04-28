@@ -788,7 +788,7 @@
     var crimeChart = d3.selectAll("svg#crimeBox"),
         margin = 200,
         width2 = barChart.attr("width")-margin,
-        height2 = barChart.attr("height")-45
+        height2 = barChart.attr("height")-50
     const crimeStateScale = d3.scaleLinear().domain([3452.8, 12076.5]).range([height2-1,0]);
 
     crimeChart.selectAll("*").remove();     
@@ -838,10 +838,10 @@
               .attr('y', crimeStateScale(stateToCrime['United States'] ) - 10)
               .text(stateToCrime['United States']);  
                   
-    let leftAxis2 = d3.axisLeft(crimeStateScale).ticks(3).tickSizeOuter(0);
+    let leftAxis2 = d3.axisLeft(crimeStateScale).ticks(5).tickSizeOuter(0);
     crimeChart.append("g")
               .attr("class", "y axis")
-              .attr("transform","translate("+(margin-width-50)+","+(margin-width-95)+")") 
+              .attr("transform","translate("+(margin-width-50)+","+(margin-width-100)+")") 
               .call(leftAxis2);
 
     let bottomAxis3 = d3.axisBottom(stateScale).tickValues([]).tickSizeOuter(0)
