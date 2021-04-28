@@ -154,7 +154,7 @@
         margin: auto;
         width: 50%;
         font-family: dmsans-regular;
-
+        color: #535353;
       }
   .directions{
     text-align:center; 
@@ -174,10 +174,10 @@
       <div class= "country_container">
         <h1 class = "directions">Policing and Crime in 2016</h1>
         <p class = "story"> Across the United States, there are varying levels of crime and policing across 
-          different counties. Our project aimed to determine whether there is a correlation
-          between the number of law enforcement in a county and the amount of criminal 
-          activity ocurring in that region. Our hypothesis was that a higher number of 
-          police officers in a state would result in lower reported crime. We were also 
+          different states and counties. Our project questions whether there is a correlation
+          between the number of law enforcement officers in a county and the amount of criminal 
+          activity ocurring in that region. Our hypothesis is that a higher number of 
+          police officers in a region would result in lower reported crime. We are also 
           interested in seeing the correlation between government spending on law enforcement
           and crime rates, the assumption being that more spending would result in less crime. 
         </p> <br>
@@ -219,12 +219,9 @@
         </div>
         
       </div>
-      <p class = "story"> After looking through the data, we realized that our original assumptions that more police
-        results in lower crime rates was incorrect. We found that it heavily depended on which state we were looking at.
-        In many states, there were counties that indicated a high policing rate and more crime, but in other states
-        there was little to no relationship between the policing rate and crime rate. After doing some research with external
-        sources, we found that more policing does not necessarily lead to a reduction in crime. It does not always lead to an
-        increase in crime, but that is often the case in many states.  
+      <p class = "story"> Our original assumption that more police results in lower crime rates is incorrect. 
+        In many states, there are counties that indicate a high policing rate and more crime, but in other states
+        there was little to no relationship between the policing rate and crime rate.
       </p> <br>
       <h3 class = "directions"> Charu Murugesan (csm246), Ishika Jain (ij36), Cristie Huang (ch746)</h3>
      
@@ -565,8 +562,12 @@
                           .duration('50')
                           .style("opacity", 0);
                 });
-
-
+    
+    let legend = ["Murder", "Rape", "Robbery", "Assault", "Burgalry", "Larceny", "Motor Theft", "Arson"]
+    var colorScaleLegend = d3.scaleOrdinal()
+                        .domain(["Murder", "Rape", "Robbery", "Assault", "Burgalry", "Larceny", "Motor Theft", "Arson" ])
+                        .range(["#264653", "#2A9D8F", "#E9C46A", "#F4A261", "#E76F51", "#05668D", "#E5989B", "#7D80BB"]);
+                        
     // creates dots for legends next to pie chart
     svgCounty.selectAll("mydots")
               .data(crimeTypes)
@@ -580,12 +581,12 @@
 
     // creates labels for each corresponding dot in legend
     svgCounty.selectAll("mylabels")
-            .data(crimeTypes)
+            .data(legend)
             .enter()
             .append("text")
             .attr("x", 120)
             .attr("y", function(d,i){ return 100 + i*25}) // 100 is where the first dot appears. 25 is the distance between dots
-            .style("fill", function(d){ return colorScale(d)})
+            .style("fill", function(d){ return colorScaleLegend(d)})
             .text(function(d){ return d})
             .attr("text-anchor", "left")
             .style("alignment-baseline", "middle")
@@ -608,9 +609,9 @@
       else{
         svgRatio.append("text")
                 .text(d3.format(".0f")(countyToPolice[(parseInt(fipsID))] * 1000) + " : 1000")
-                .attr("x", 100)
-                .attr("y", 100)
-                .attr("text-anchor", "middle")
+                .attr("x", 150)
+                .attr("y", 90)
+                .attr("text-anchor", "end")
                 .attr("class", "ratio")
                 .style("fill", "#2C7E7E")
                 .style("font-size", "35px");
@@ -618,7 +619,7 @@
         svgRatio.append("text")
                 .text("police to civilian ratio")
                 .attr("x",170)
-                .attr("y",96)
+                .attr("y",85)
                 .style("font-size", "14px")
                 .attr("font-family", "dmsans-regular")
                 .style("fill", "#535353");
@@ -642,36 +643,19 @@
       else{
         crimeRatio.append("text")
                 .text(countyToCrime[(parseInt(fipsID))])
-                .attr("x", 90)
+                .attr("x", 150)
                 .attr("y", 90)
                 .attr("text-anchor", "end")
                 .attr("class", "ratio")
                 .style("fill", "#2C7E7E")
-
-        
-                .style("font-size", "160%")
+                .style("font-size", "35px");
 
         crimeRatio.append("text")
-                .text("crimes per ")
-                .attr("x",95)
+                .text("crimes per 100,000 residents")
+                .attr("x",170)
                 .attr("y",87)
-                .attr("font-family", "dmsans-regular")
-
-      crimeRatio.append("text")
-                .text("100,000")
-                .attr("x",180)
-                .attr("y",90)
-                .attr("class", "ratio")
-                .style("font-size", "160%")
-
-                
-
-      crimeRatio.append("text")
-                .text("residents")
-                .attr("x",287)
-                .attr("y",87)
-                .attr("font-family", "dmsans-regular")
                 .style("font-size", "14px")
+                .attr("font-family", "dmsans-regular")
                 .style("fill", "#535353");
               
       }
