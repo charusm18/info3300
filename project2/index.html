@@ -55,14 +55,14 @@
       }
       .stateBox{
         width: 350px;
-        height: 500px;
+        height: 600px;
         padding: 10px;
         border: 5px solid black ;
         margin: 0;
       }
       .countyBox{
         width: 350px;
-        height: 500px;
+        height: 600px;
         padding: 10px;
         border: 5px solid black ;
         margin: 0;
@@ -85,6 +85,12 @@
         font-weight: bold;
         margin: 0;
       }
+      .ratio{
+        color: black;
+        font-size:180%;
+        font-weight: bold;
+        margin: 0;
+      }
 
       .nation {
     fill: #ddd;
@@ -101,7 +107,7 @@
     </head>
     <body>
       <div class= "country_container">
-        <svg id="usmap" height="600" width="900" style="background: #445; margin-top:50px" >
+        <svg id="usmap" height="500" width="900" style="background: #264653; margin:auto; display: block" >
         </svg>
       </div>
       
@@ -111,15 +117,20 @@
           </svg>
         </div>
         <div class="infographic">
-          <div class ="stateBox">
+          <div class ="stateBox" id = "stateDiv">
             <p id = "p1" class = "stateLabel"></p>
-            <svg width="300" height="225" id = "stateBox"></svg>
-            <svg width="300" height="225" id = "crimeBox"></svg>
+            <svg width="300" height="200" id = "stateBox"></svg>
+            <p id = "stateText"></p>
+            <svg width="300" height="200" id = "crimeBox"></svg>
+            <p id = "crimeLabel"></p>
           </div>
 
-          <div class ="countyBox">
+          <div id = "county" class ="countyBox">
             <p id = "p2" class = "stateLabel"></p>
-            <svg id = "pieChart" width = 500 height = 500></svg>
+            <svg id = "pieChart" width = 400 height = 250 ></svg>
+            <svg id = "ratio" width = 500 height = 100 ></svg>
+            <svg id = "crimeRatio" width = 500 height = 200 ></svg>
+
           </div>
         </div>
       </div>
@@ -247,7 +258,8 @@
             }
 
           }
-        }        
+        }
+        console.log(countyDictionary['AK'])       
   
     let colorMatrix = [ ["#C9D7DC", "#99B1D1", "#5E8CD0"],
                         ["#9CC3B6", "#73A4B4", "#4A82B3"],
@@ -312,7 +324,6 @@
       let stateID = state.datum().id;
       var stateAbr = stateToCode[idToState[stateID]];
       var stateName = idToState[stateID]
-      
   
       var projection = d3.geoMercator().fitSize([stWidth-200, stHeight-200], {type: "FeatureCollection", features: countyDictionary[stateAbr]});
       var path = d3.geoPath().projection(projection);
@@ -358,7 +369,6 @@
       pieChart.selectAll("*").remove();  
       let g = svgCounty.append("g")
               .attr("transform", "translate(100,150)");
-      console.log("data: " + data)
       if(data == undefined){
         pieChart.append("text")
                     .attr("class", "x label")
@@ -379,221 +389,342 @@
       var arcs = g.selectAll("arc")
                   .data(pie(data))
                   .enter()
-                  .append("g");
+                  .append("g")
+                  .attr("dataVal", console.log(pie(data)));
       var colorScale = d3.scaleOrdinal()
                         .domain(["Murder", "Rape", "Robbery", "Assault", "Burgalry", "Larceny", "Motor", "Arson" ])
                         .range(["#264653", "#2A9D8F", "#E9C46A", "#F4A261", "#E76F51", "#05668D", "#E5989B", "#7D80BB"]);
 
+      var div = d3.select("body").append("div")
+          .attr("class", "tooltip-donut")
+          .style("opacity", 0);
+      
       // Appending path 
       let crimeTypes = ["Murder", "Rape", "Robbery", "Assault", "Burgalry", "Larceny", "Motor", "Arson"]
-      // let index = 0
+
+      let tooltipWidth = 120;
+      let tooltipHeight = 40;
+      let tooltip = d3.select("#pieChart").append("g")
+                     .attr("class","tooltip")
+                     .attr("visibility","hidden");
+      tooltip.append("rect")
+              .attr("fill", "#56a0bf")
+              .attr("opacity", 0.9)
+              .attr("x", -tooltipWidth / 2.0)
+              .attr("y", 0)
+              .attr("width",tooltipWidth)
+              .attr("height",tooltipHeight)
+      let txt = tooltip.append("text")
+                     .attr("fill", "black")
+                     .attr("text-anchor","middle")
+                     .attr("alignment-baseline","hanging")
+                     .attr("x", 0)
+                     .attr("y", 10);
+     
+
+      let momesh =  d3.select("#pieChart").append("path")
+                        .attr("class","mouseover outline")
+                        .attr("d", "");
+
+    
       arcs.append("path")
           .attr("fill", (data, i)=>{
-            console.log("i: " + i)
             let value=data.data;
-            console.log("one step before: " + crimeTypes[i])
-            console.log("color: " + colorScale[crimeTypes[i]])
             return colorScale(crimeTypes[i]);
-
             
           })
-          .attr("d", arc);
-          
-        
+          .attr("d", arc)
+          .attr("dataVal", d=> d.data)
+          .on("mouseenter", mouseEntersPlot)
+          .on("mouseout",  mouseLeavesPlot);
 
-          // Add one dot in the legend for each name.
-          svgCounty.selectAll("mydots")
-            .data(crimeTypes)
-            .enter()
-            .append("circle")
+    function mouseEntersPlot() {
+    
+        tooltip.style("visibility","visible")
+    
+    
+        let arc = d3.select(this);
+        // console.log(arc.datum())
+        txt.text(d3.format(".1%")(arc.datum().dataVal));
+        tooltip.attr("transform","translate(100,255)");
+
+    }
+
+    function mouseLeavesPlot() {
+        tooltip.style("visibility","hidden");
+        let arc = d3.select(this);
+        momesh.attr("d", "");
+    }
+          
+    svgCounty.selectAll("mydots")
+              .data(crimeTypes)
+              .enter()
+              .append("circle")
               .attr("cx", 100)
               .attr("cy", function(d,i){ return 100 + i*25}) // 100 is where the first dot appears. 25 is the distance between dots
               .attr("r", 7)
               .style("fill", function(d){ return colorScale(d)})
               .attr("transform","translate(120,-40)")
 
-          // Add one dot in the legend for each name.
-          svgCounty.selectAll("mylabels")
+    svgCounty.selectAll("mylabels")
             .data(crimeTypes)
             .enter()
             .append("text")
-              .attr("x", 120)
-              .attr("y", function(d,i){ return 100 + i*25}) // 100 is where the first dot appears. 25 is the distance between dots
-              .style("fill", function(d){ return colorScale(d)})
-              .text(function(d){ return d})
-              .attr("text-anchor", "left")
-              .style("alignment-baseline", "middle")
-              .attr("transform","translate(120,-40)")
-       
-
+            .attr("x", 120)
+            .attr("y", function(d,i){ return 100 + i*25}) // 100 is where the first dot appears. 25 is the distance between dots
+            .style("fill", function(d){ return colorScale(d)})
+            .text(function(d){ return d})
+            .attr("text-anchor", "left")
+            .style("alignment-baseline", "middle")
+            .attr("transform","translate(120,-40)")
       }
-      
-          
-      
 
-      }      
+      d3.selectAll("svg#ratio").selectAll("*").remove();
+      var svgRatio = d3.selectAll("#ratio");
+      if(countyToPolice[parseInt(fipsID)] == undefined){
+        svgRatio.append("text")
+                .text("This county did not report any police data for 2016")
+                .attr("x",20)
+                .attr("y",96);
+      }
+      else{
+        svgRatio.append("text")
+                .text(d3.format(".1f")(countyToPolice[(parseInt(fipsID))] * 1000) + " : 1000")
+                .attr("x", 100)
+                .attr("y", 100)
+                .attr("text-anchor", "middle")
+                .attr("class", "ratio")
+
+        svgRatio.append("text")
+                .text("police to civilian ratio")
+                .attr("x",170)
+                .attr("y",96)
+      }
+      d3.selectAll("svg#crimeRatio").selectAll("*").remove();
+      var crimeRatio = d3.selectAll("#crimeRatio");
+      if(countyToCrime[parseInt(fipsID)] == undefined){
+        crimeRatio.append("text")
+                .text("This county did not report any crime data for 2016")
+                .attr("x",20)
+                .attr("y",96);
+      }
+      else{
+        crimeRatio.append("text")
+                .text(countyToCrime[(parseInt(fipsID))])
+                .attr("x", 60)
+                .attr("y", 100)
+                .attr("text-anchor", "middle")
+                .attr("class", "ratio")
+
+        crimeRatio.append("text")
+                .text("crimes per ")
+                .attr("x",90)
+                .attr("y",96)
+
+      crimeRatio.append("text")
+                .text("100,000")
+                .attr("x",160)
+                .attr("y",100)
+                .attr("class", "ratio")
+
+      crimeRatio.append("text")
+                .text("residents")
+                .attr("x",260)
+                .attr("y",96)
+      }
+
+    }      
       
-      function countyHover(){
+    function countyHover(){
         let county = d3.select(this);      
         county.attr("stroke","white")
-           .attr("stroke-width", 3);
+              .attr("stroke-width", 3);
 
       }
 
-      function countyExit(){
+    function countyExit(){
         let county = d3.select(this);      
         county.attr("stroke","white")
-           .attr("stroke-width", 1);
+              .attr("stroke-width", 1);
       }
       
       
-      d3.select("#p2").text("")
-      d3.selectAll("svg#pieChart").selectAll("*").remove();
-      d3.selectAll("#p1").text(stateName + " Statistics")
+    d3.select("#p2").text("")
+    d3.selectAll("svg#pieChart").selectAll("*").remove();
+    d3.selectAll("#p1").text(stateName + " Statistics")
       
-      var barChart = d3.selectAll("svg#stateBox"),
+    var barChart = d3.selectAll("svg#stateBox"),
         margin = 200,
         width = barChart.attr("width")-margin,
         height = barChart.attr("height")-50
 
-      const stateScale = d3.scaleLinear().domain([0, 1]).range([margin, width]);
-      const spendingScale = d3.scaleLinear().domain([172,864]).range([height-1,0]);
-      barChart.selectAll("*").remove();     
-      barChart.append("line")
-                  .attr("x1",stateScale(0) )
-                  .attr("x2",stateScale(0) )
-                  .attr("y1",height)
-                  .attr("y2",spendingScale(stateToSpending[stateName])) 
-                  .style("stroke", '#599065')
-                  .style("stroke-width", 45)
-                  .attr("fill", 'grey')
+    const stateScale = d3.scaleLinear().domain([0, 1]).range([margin, width]);
+    const spendingScale = d3.scaleLinear().domain([172,864]).range([height-1,0]);
+    barChart.selectAll("*").remove();   
+
+    barChart.append("line")
+            .attr("x1",stateScale(0) )
+            .attr("x2",stateScale(0) )
+            .attr("y1",height)
+            .attr("y2",spendingScale(stateToSpending[stateName])) 
+            .style("stroke", '#599065')
+            .style("stroke-width", 45)
+            .attr("fill", 'grey')
           
-      barChart.append("line")
-                  .attr("x1",stateScale(1)) //50 accounts for the padding
-                  .attr("x2",stateScale(1))
-                  .attr("y1",height)
-                  .attr("y2",spendingScale(stateToSpending['United States'] )) 
-                  .style("stroke", '#599065')
-                  .style("stroke-width", 45)
-                  .attr("fill",'grey')
+    barChart.append("line")
+            .attr("x1",stateScale(1)) 
+            .attr("x2",stateScale(1))
+            .attr("y1",height)
+            .attr("y2",spendingScale(stateToSpending['United States'] )) 
+            .style("stroke", '#599065')
+            .style("stroke-width", 45)
+            .attr("fill",'grey')
 
-      barChart.append("text")
-                    .attr("class", "x label")
-                    .attr("text-anchor", "middle")
-                    .attr("x", stateScale(0))
-                    .attr("y", height + 20)
-                    .text(stateToCode[stateName]);
+    barChart.append("text")
+            .attr("class", "x label")
+            .attr("text-anchor", "middle")
+            .attr("x", stateScale(0))
+            .attr("y", height + 20)
+            .text(stateToCode[stateName]);
 
-      barChart.append("text")
-                    .attr("class", "x label")
-                    .attr("text-anchor", "middle")
-                    .attr("x", stateScale(1))
-                    .attr("y", height + 20)
-                    .text("US");
+    barChart.append("text")
+            .attr("class", "x label")
+            .attr("text-anchor", "middle")
+            .attr("x", stateScale(1))
+            .attr("y", height + 20)
+            .text("US");
 
-        //for each bar, create a label on top of bar with percentage for 2010
-        barChart.append("text")
-                  .attr("text-anchor","middle")
-                  .attr("font-size","20px")
-                  .attr("x",stateScale(0))
-                  .attr('y',spendingScale(stateToSpending[stateName]) - 10)
-                  .text("$"+stateToSpending[stateName]+' K');
+    barChart.append("text")
+            .attr("text-anchor","middle")
+            .attr("font-size","20px")
+            .attr("x",stateScale(0))
+            .attr('y',spendingScale(stateToSpending[stateName]) - 10)
+            .text("$"+stateToSpending[stateName]+' K');
           
-        //for each bar, create a label on top of bar with percentage for 2019
-        barChart.append("text")
-                  .attr("text-anchor","middle")
-                  .attr("font-size","20px")
-                  .attr("x",stateScale(1))
-                  .attr('y',spendingScale(stateToSpending['United States'] ) - 10)
-                  .text("$"+stateToSpending['United States']+' K');
+    barChart.append("text")
+            .attr("text-anchor","middle")
+            .attr("font-size","20px")
+            .attr("x",stateScale(1))
+            .attr('y',spendingScale(stateToSpending['United States'] ) - 10)
+            .text("$"+stateToSpending['United States']+' K');
 
-          let leftAxis = d3.axisLeft(spendingScale).ticks(5).tickSizeOuter(0);
-          barChart.append("g")
+    let leftAxis = d3.axisLeft(spendingScale).ticks(5).tickSizeOuter(0);
+    barChart.append("g")
             .attr("class", "y axis")
             .attr("transform","translate("+(margin-width-50)+","+(margin-width-100)+")") 
             .call(leftAxis);
 
-          let bottomAxis = d3.axisBottom(stateScale).tickValues([])
-                            .tickSizeOuter(0)
-          // d3.barChart.axis().outerTickSize(0);
-
-          let element = barChart.append("g")
+    let bottomAxis = d3.axisBottom(stateScale).tickValues([]).tickSizeOuter(0)
+    let element = barChart.append("g")
                           .attr("class", "x axis")
-                          .attr("transform","translate("+(margin-height-75)+","+(margin-25)+")")
+                          .attr("transform","translate("+(margin-height-75)+","+(margin-25)+")")                  
+    bottomAxis(element);
+    let bottomAxis2 = d3.axisBottom(stateScale).tickValues([]);
+    let element2 = barChart.append("g")
+                           .attr("class", "x axis")
+                           .attr("transform","translate("+(margin-height+25)+","+(margin-25)+")")
                           
-          bottomAxis(element);
-          let bottomAxis2 = d3.axisBottom(stateScale).tickValues([]);
-          let element2 = barChart.append("g")
-                          .attr("class", "x axis")
-                          .attr("transform","translate("+(margin-height+25)+","+(margin-25)+")")
-                          
-          bottomAxis(element2);
+    bottomAxis(element2);
+    if(stateToSpending[stateName] > stateToSpending["United States"]){          
+        var barChartText = stateName + " spends $"+ stateToSpending[stateName] + "K a year on police spending, \n which is $"+ (stateToSpending[stateName]- stateToSpending["United States"]) + "K more than the national average"
+    }        
+    else{          
+        var barChartText = stateName + " spends $"+ stateToSpending[stateName] + "K a year on police spending, \n which is $"+ (stateToSpending["United States"]- stateToSpending[stateName]) + "K less than the national average"
+    }
+    d3.select("#stateText").text("")
+                            .attr("class", "stateBoxLabel")
+                            .attr("text-anchor", "middle")
+                            .text(barChartText);
 
-      var crimeChart = d3.selectAll("svg#crimeBox"),
+    var crimeChart = d3.selectAll("svg#crimeBox"),
         margin = 200,
         width2 = barChart.attr("width")-margin,
         height2 = barChart.attr("height")-50
-      const crimeStateScale = d3.scaleLinear().domain([3452.8, 12076.5]).range([height2-1,0]);
+    const crimeStateScale = d3.scaleLinear().domain([3452.8, 12076.5]).range([height2-1,0]);
 
-      crimeChart.selectAll("*").remove();     
-      crimeChart.append("line")
-                  .attr("x1",stateScale(0) )
-                  .attr("x2",stateScale(0) )
-                  .attr("y1",height2)
-                  .attr("y2",crimeStateScale(stateToCrime[stateName])) 
-                  .style("stroke", '#DC8471')
-                  .style("stroke-width", 45)
-                  .attr("fill", 'grey')
+    crimeChart.selectAll("*").remove();     
+    crimeChart.append("line")
+              .attr("x1",stateScale(0) )
+              .attr("x2",stateScale(0) )
+              .attr("y1",height2)
+              .attr("y2",crimeStateScale(stateToCrime[stateName])) 
+              .style("stroke", '#DC8471')
+              .style("stroke-width", 45)
+              .attr("fill", 'grey')
           
-      crimeChart.append("line")
-                  .attr("x1",stateScale(1))
-                  .attr("x2",stateScale(1))
-                  .attr("y1",height2)
-                  .attr("y2",crimeStateScale(stateToCrime['United States'] )) 
-                  .style("stroke", '#DC8471')
-                  .style("stroke-width", 45)
-                  .attr("fill",'grey')
+    crimeChart.append("line")
+              .attr("x1",stateScale(1))
+              .attr("x2",stateScale(1))
+              .attr("y1",height2)
+              .attr("y2",crimeStateScale(stateToCrime['United States'] )) 
+              .style("stroke", '#DC8471')
+              .style("stroke-width", 45)
+              .attr("fill",'grey')
 
-      crimeChart.append("text")
-                    .attr("class", "x label")
-                    .attr("text-anchor", "middle")
-                    .attr("x", stateScale(0))
-                    .attr("y", height2 + 20)
-                    .text(stateToCode[stateName]);
+    crimeChart.append("text")
+              .attr("class", "x label")
+              .attr("text-anchor", "middle")
+              .attr("x", stateScale(0))
+              .attr("y", height2 + 20)
+              .text(stateToCode[stateName]);
 
-      crimeChart.append("text")
-                    .attr("class", "x label")
-                    .attr("text-anchor", "middle")
-                    .attr("x", stateScale(1))
-                    .attr("y", height2 + 20)
-                    .text("US");
+    crimeChart.append("text")
+              .attr("class", "x label")
+              .attr("text-anchor", "middle")
+              .attr("x", stateScale(1))
+              .attr("y", height2 + 20)
+              .text("US");
 
-        crimeChart.append("text")
-                  .attr("text-anchor","middle")
-                  .attr("font-size","20px")
-                  .attr("x",stateScale(0))
-                  .attr('y',crimeStateScale(stateToCrime[stateName]) - 10)
-                  .text(stateToCrime[stateName]);
+    crimeChart.append("text")
+              .attr("text-anchor","middle")
+              .attr("font-size","20px")
+              .attr("x",stateScale(0))
+              .attr('y',crimeStateScale(stateToCrime[stateName]) - 10)
+              .text(stateToCrime[stateName]);
           
-        crimeChart.append("text")
-                  .attr("text-anchor","middle")
-                  .attr("font-size","20px")
-                  .attr("x",stateScale(1))
-                  .attr('y', crimeStateScale(stateToCrime['United States'] ) - 10)
-                  .text(stateToCrime['United States']);   
+    crimeChart.append("text")
+              .attr("text-anchor","middle")
+              .attr("font-size","20px")
+              .attr("x",stateScale(1))
+              .attr('y', crimeStateScale(stateToCrime['United States'] ) - 10)
+              .text(stateToCrime['United States']);  
+                  
+    let leftAxis2 = d3.axisLeft(crimeStateScale).ticks(3).tickSizeOuter(0);
+    crimeChart.append("g")
+              .attr("class", "y axis")
+              .attr("transform","translate("+(margin-width-50)+","+(margin-width-100)+")") 
+              .call(leftAxis2);
+
+    let bottomAxis3 = d3.axisBottom(stateScale).tickValues([]).tickSizeOuter(0)
+    let element1 = crimeChart.append("g")
+                              .attr("class", "x axis")
+                              .attr("transform","translate("+(margin-height-75)+","+(margin-25)+")")                   
+    bottomAxis3(element1);
+    let bottomAxis4 = d3.axisBottom(stateScale).tickValues([]);
+    let element3 = crimeChart.append("g")
+                              .attr("class", "x axis")
+                              .attr("transform","translate("+(margin-height+25)+","+(margin-25)+")")
+                          
+    bottomAxis(element3);
+
+    if(stateToCrime[stateName] > stateToCrime["United States"]){          
+        var crimeChartText = stateName + " experiences "+ stateToCrime[stateName]  + " crimes for every 100,000 residents. This is "+ parseInt(stateToCrime[stateName]- stateToCrime["United States"]) + " more than the national average"
+    }        
+    else{          
+      var crimeChartText = stateName + " experiences "+ stateToCrime[stateName]  + " crimes for every 100,000 residents. This is "+ parseInt(stateToCrime["United States"]- stateToCrime[stateName]) + " less than the national average"
+    }
+    d3.select("#crimeLabel").text("")
+                            .attr("class", "stateBoxLabel")
+                            .text(crimeChartText);
 
     }
     
    
-      };
-      requestData();
+  };
+  requestData();
     
     
-      </script>
+  </script>
      
-    
-
-      </div>
-    </body>
-    </html>
+        </html>
     
