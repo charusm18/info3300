@@ -90,6 +90,7 @@
         font-size:180%;
         font-weight: bold;
         margin: 0;
+        
       }
 
       .nation {
@@ -98,6 +99,7 @@
 
   .directions{
     text-align:center; 
+    font-family: dmsans-regular;
   }
  
 
@@ -512,6 +514,8 @@
                 .text("police to civilian ratio")
                 .attr("x",170)
                 .attr("y",96)
+                .attr("font-family", "dmsans-regular")
+
       }
       
 
@@ -536,17 +540,20 @@
                 .text("crimes per ")
                 .attr("x",100)
                 .attr("y",96)
+                .attr("font-family", "dmsans-regular")
 
       crimeRatio.append("text")
                 .text("100,000")
-                .attr("x",170)
+                .attr("x",180)
                 .attr("y",100)
                 .attr("class", "ratio")
+                
 
       crimeRatio.append("text")
                 .text("residents")
-                .attr("x",270)
+                .attr("x",280)
                 .attr("y",96)
+                .attr("font-family", "dmsans-regular")
       }
      
 
