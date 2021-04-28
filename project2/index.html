@@ -1,11 +1,12 @@
 
 <html>
   <head>
-    
+      
       <script src="https://d3js.org/d3.v6.min.js"></script>
       <script src="https://d3js.org/topojson.v2.min.js"></script>
       <style>
 
+      /* Styling for pie chart tooltip  */
       div.tooltip {
           position: absolute;
           text-align: center;
@@ -17,7 +18,7 @@
           pointer-events: none;
           font-size: 1.3rem;
       }
-          
+
       @font-face {
         font-family: dmsans-regular;
         src: url('/font/DMSans-Regular.ttf');
@@ -31,25 +32,56 @@
         margin-top: 10px;
         margin-bottom: 20px;
         text-align: center;
+        color: #2C7E7E;
       }
       #p2{
         font-family: dmsans-bold;
         margin-top: 10px;
         margin-bottom: 20px;
         text-align: center;
+        color: #2C7E7E;
       }
       #stateBox{
         font-family: dmsans-regular;
       }
+      #stateText{
+        color: #2C7E7E;
+        font-family: dmsans-regular;
+        font-size: 14px;
+        text-align: center;
+        padding: 0px 20px;
+      }
+      #crimeLabel{
+        color: #2C7E7E;
+        font-family: dmsans-regular;
+        font-size: 14px;
+        text-align: center;
+        padding: 0px 20px;
+      }
       #countyBox{
+        font-family: dmsans-regular;
+      }
+      .ratio{
+        font-family: dmsans-bold;
+        color: #2C7E7E;
+      }
+      #ratio{
+        font-family: dmsans-regular;
+      }
+      #no-crime{
+        color: red;
+      }
+      #crimeRatio{
         font-family: dmsans-regular;
       }
       #crimeBox{
         font-family: dmsans-regular;
       }
+      .legend{
+        font-family: dmsans-regular;
+      }
       #pieChart{
         font-family: dmsans-regular;
-        
       }
     
       .state {
@@ -70,14 +102,20 @@
         width: 350px;
         height: 600px;
         padding: 10px;
-        border: 5px solid black ;
+        border: 2px solid #2C7E7E ;
+        border-right:none;
         margin: 0;
       }
       .countyBox{
         width: 350px;
         height: 600px;
         padding: 10px;
-        border: 5px solid black ;
+        border: 2px solid #2C7E7E ;
+        border-left: none;
+        background-image: linear-gradient(to bottom, #2C7E7E 20%, rgba(255, 255, 255, 0) 0%);
+        background-position: left;
+        background-size: 2px 10px;
+        background-repeat: repeat-y;
         margin: 0;
       }
       .state_container{
@@ -91,7 +129,7 @@
         display:flex;
         width: auto;
       }
-
+      
       .stateLabel{
         color: black;
         font-size:160%;
@@ -103,21 +141,24 @@
         font-size:180%;
         font-weight: bold;
         margin: 0;
+        
       }
 
       .nation {
         fill: #ddd;
       }
 
-      .directions{
-        text-align:center; 
-      }
-
       .story{
         text-align:center;
         margin: auto;
         width: 50%;
+        font-family: dmsans-regular;
+
       }
+  .directions{
+    text-align:center; 
+    font-family: dmsans-regular;
+  }
  
 
       </style>
@@ -125,7 +166,7 @@
     </head>
     <body>
       <div class= "country_container">
-        <h1 class = "directions">Policing and Crime Data in 2016</h1>
+        <h1 class = "directions">Policing and Crime in 2016</h1>
         <p class = "story"> Across the United States, there are varying levels of crime and policing across 
           different counties. Our project aimed to determine whether there is a correlation
           between the number of law enforcement in a county and the amount of criminal 
@@ -133,14 +174,13 @@
           police officers in a state would result in lower reported crime. We were also 
           interested in seeing the correlation between government spending on law enforcement
           and crime rates, the assumption being that more spending would result in less crime. 
-        </p>
+        </p> <br>
         <h3 class = "directions">
-          Click on a state to see its overall police and crime data 
+          Click on a state and scroll down to see its overall police and crime data
         </h3>
         <svg id="usmap" height="500" width="900" style="background: #264653; margin:auto; display: block" >
         </svg>
       </div>
-      
       
       <div class= "container">
         <div class="state_container">
@@ -167,7 +207,17 @@
           </div>
           
         </div>
+        
       </div>
+      <p class = "story"> After looking through the data, we realized that our original assumptions that more police
+        results in lower crime rates was incorrect. We found that it heavily depended on which state we were looking at.
+        In many states, there were counties that indicated a high policing rate and more crime, but in other states
+        there was little to no relationship between the policing rate and crime rate. After doing some research with external
+        sources, we found that more policing does not necessarily lead to a reduction in crime. It does not always lead to an
+        increase in crime, but that is often the case in many states.  
+      </p> <br>
+      <h3 class = "directions"> Charu Murugesan (csm246), Ishika Jain (ij36), Cristie Huang (ch746)</h3>
+     
     </body>
   
     <script>
@@ -198,7 +248,7 @@
 
 
         const count = await d3.json("../counties-10m.json");
-        const us = await d3.json("../us-smaller.json");
+        const us = await d3.json("../us-smaller.json")
 
         const stateNames = await d3.tsv("../us-state-names.tsv");
 
@@ -211,7 +261,9 @@
            .join("path")
            .attr("class", "state")
            .attr("note", d => d.id)
-           .attr("d", path);
+           .attr("d", path)
+          //  .attr("d", d => { if(d.id != 2) path});
+
       
         map.append("path").datum(statesMesh)
            .attr("class","outline")
@@ -386,7 +438,7 @@
       let valueExtent = d3.extent(crime, d => d.total_crime);
       let colorScale = d3.scaleSequential(d3.interpolateViridis).domain(valueExtent)
 
-      //determines what to do when you click on a county
+      // determines what to do when you click on a county
       function countyClick() {
         let county = d3.select(this);
         let fipsID = county.datum().id;
@@ -407,7 +459,8 @@
                     .attr("text-anchor", "middle")
                     .attr("x",170)
                     .attr("y",200)
-                    .text("This county did not report any crime data for 2016");
+                    .text("This county did not report any crime data for 2016")
+                    .style("font-size", "14px");
       }
       else{
       var pie = d3.pie()
@@ -492,9 +545,10 @@
       const svgRatio = d3.selectAll("#ratio");
       if(countyToPolice[parseInt(fipsID)] == undefined){
         svgRatio.append("text")
-                .text("This county did not report any police data for 2016")
+                .text("This county did not report any police data for 2016.")
                 .attr("x",20)
-                .attr("y",96);
+                .attr("y",96)
+                .style("font-size", "14px");
       }
       else{
         svgRatio.append("text")
@@ -508,6 +562,8 @@
                 .text("police to civilian ratio")
                 .attr("x",170)
                 .attr("y",96)
+                .attr("font-family", "dmsans-regular")
+
       }
       
 
@@ -516,9 +572,10 @@
       
       if(countyToCrime[parseInt(fipsID)] == undefined){
         crimeRatio.append("text")
-                .text("This county did not report any crime data for 2016")
+                .text("This county did not report any crime data for 2016.")
                 .attr("x",20)
-                .attr("y",96);
+                .attr("y",96)
+                .style("font-size", "14px");
       }
       else{
         crimeRatio.append("text")
@@ -532,17 +589,20 @@
                 .text("crimes per ")
                 .attr("x",100)
                 .attr("y",96)
+                .attr("font-family", "dmsans-regular")
 
       crimeRatio.append("text")
                 .text("100,000")
-                .attr("x",170)
+                .attr("x",180)
                 .attr("y",100)
                 .attr("class", "ratio")
+                
 
       crimeRatio.append("text")
                 .text("residents")
-                .attr("x",270)
+                .attr("x",280)
                 .attr("y",96)
+                .attr("font-family", "dmsans-regular")
       }
      
 
