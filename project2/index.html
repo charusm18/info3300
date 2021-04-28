@@ -28,20 +28,19 @@
       }
       #p1{
         font-family: dmsans-bold;
-        margin-top: 10px;
         margin-bottom: 20px;
         text-align: center;
         color: #2C7E7E;
       }
       #p2{
         font-family: dmsans-bold;
-        margin-top: 10px;
         margin-bottom: 20px;
         text-align: center;
         color: #2C7E7E;
       }
       #stateBox{
         font-family: dmsans-regular;
+        margin-left: 30px;
       }
       #stateText{
         color: #2C7E7E;
@@ -75,6 +74,8 @@
       }
       #crimeBox{
         font-family: dmsans-regular;
+        margin-top: 10px;
+        margin-left: 30px;
       }
       .legend{
         font-family: dmsans-regular;
@@ -100,16 +101,16 @@
       .stateBox{
         width: 350px;
         height: 600px;
-        padding: 10px;
-        border: 2px solid #2C7E7E ;
+        padding: 30px;
+        border: 3px solid #2C7E7E ;
         border-right:none;
         margin: 0;
       }
       .countyBox{
         width: 350px;
         height: 600px;
-        padding: 10px;
-        border: 2px solid #2C7E7E ;
+        padding: 30px;
+        border: 3px solid #2C7E7E ;
         border-left: none;
         background-image: linear-gradient(to bottom, #2C7E7E 20%, rgba(255, 255, 255, 0) 0%);
         background-position: left;
@@ -165,7 +166,7 @@
     <body>
       <div class= "country_container">
         <p class = "directions">
-          Press on a state to see its overall police and crime data 
+          Select a state to see its overall police and crime data 
         </p>
         <svg id="usmap" height="500" width="900" style="background: #264653; margin:auto; display: block" >
         </svg>
@@ -535,12 +536,16 @@
                 .attr("y", 100)
                 .attr("text-anchor", "middle")
                 .attr("class", "ratio")
+                .style("fill", "#2C7E7E")
+                .style("font-size", "35px");
 
         svgRatio.append("text")
                 .text("police to civilian ratio")
                 .attr("x",170)
                 .attr("y",96)
+                .style("font-size", "14px")
                 .attr("font-family", "dmsans-regular")
+                .style("fill", "#535353");
 
       }
       
@@ -562,25 +567,17 @@
                 .attr("y", 100)
                 .attr("text-anchor", "middle")
                 .attr("class", "ratio")
+                .style("fill", "#2C7E7E")
+                .style("font-size", "35px");
 
         crimeRatio.append("text")
-                .text("crimes per ")
-                .attr("x",100)
+                .text("crimes per 100,000 residents")
+                // .attr("x",120)
                 .attr("y",96)
                 .attr("font-family", "dmsans-regular")
-
-      crimeRatio.append("text")
-                .text("100,000")
-                .attr("x",180)
-                .attr("y",100)
-                .attr("class", "ratio")
-                
-
-      crimeRatio.append("text")
-                .text("residents")
-                .attr("x",280)
-                .attr("y",96)
-                .attr("font-family", "dmsans-regular")
+                .style("font-size", "14px")
+                .style("fill", "#535353");
+              
       }
      
 
@@ -670,12 +667,12 @@
     let bottomAxis = d3.axisBottom(stateScale).tickValues([]).tickSizeOuter(0)
     let element = barChart.append("g")
                           .attr("class", "x axis")
-                          .attr("transform","translate("+(margin-height-75)+","+(margin-25)+")")                  
+                          .attr("transform","translate("+(margin-height-100)+","+(margin-50)+")")                  
     bottomAxis(element);
     let bottomAxis2 = d3.axisBottom(stateScale).tickValues([]);
     let element2 = barChart.append("g")
                            .attr("class", "x axis")
-                           .attr("transform","translate("+(margin-height+25)+","+(margin-25)+")")
+                           .attr("transform","translate("+(margin-height)+","+(margin-50)+")")
                           
     bottomAxis(element2);
     if(stateToSpending[stateName] > stateToSpending["United States"]){          
@@ -692,7 +689,7 @@
     var crimeChart = d3.selectAll("svg#crimeBox"),
         margin = 200,
         width2 = barChart.attr("width")-margin,
-        height2 = barChart.attr("height")-50
+        height2 = barChart.attr("height")-45
     const crimeStateScale = d3.scaleLinear().domain([3452.8, 12076.5]).range([height2-1,0]);
 
     crimeChart.selectAll("*").remove();     
@@ -745,18 +742,18 @@
     let leftAxis2 = d3.axisLeft(crimeStateScale).ticks(3).tickSizeOuter(0);
     crimeChart.append("g")
               .attr("class", "y axis")
-              .attr("transform","translate("+(margin-width-50)+","+(margin-width-100)+")") 
+              .attr("transform","translate("+(margin-width-50)+","+(margin-width-95)+")") 
               .call(leftAxis2);
 
     let bottomAxis3 = d3.axisBottom(stateScale).tickValues([]).tickSizeOuter(0)
     let element1 = crimeChart.append("g")
                               .attr("class", "x axis")
-                              .attr("transform","translate("+(margin-height-75)+","+(margin-25)+")")                   
+                              .attr("transform","translate("+(margin-height-100)+","+(margin-50)+")")                   
     bottomAxis3(element1);
     let bottomAxis4 = d3.axisBottom(stateScale).tickValues([]);
     let element3 = crimeChart.append("g")
                               .attr("class", "x axis")
-                              .attr("transform","translate("+(margin-height+25)+","+(margin-25)+")")
+                              .attr("transform","translate("+(margin-height)+","+(margin-50)+")")
                           
     bottomAxis(element3);
 
