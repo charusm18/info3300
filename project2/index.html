@@ -1,10 +1,23 @@
 
-<html><head>
+<html>
+  <head>
     
       <script src="https://d3js.org/d3.v6.min.js"></script>
       <script src="https://d3js.org/topojson.v2.min.js"></script>
       <style>
 
+      div.tooltip {
+          position: absolute;
+          text-align: center;
+          padding: .5rem;
+          background: #FFFFFF;
+          color: #313639;
+          border: 1px solid #313639;
+          border-radius: 8px;
+          pointer-events: none;
+          font-size: 1.3rem;
+      }
+          
       @font-face {
         font-family: dmsans-regular;
         src: url('/font/DMSans-Regular.ttf');
@@ -127,11 +140,18 @@
         font-size:180%;
         font-weight: bold;
         margin: 0;
+        
       }
 
       .nation {
     fill: #ddd;
   }
+
+  .directions{
+    text-align:center; 
+    font-family: dmsans-regular;
+  }
+ 
 
   /* .outline {
     stroke: #fff;
@@ -144,14 +164,20 @@
     </head>
     <body>
       <div class= "country_container">
+        <p class = "directions">
+          Press on a state to see its overall police and crime data 
+        </p>
         <svg id="usmap" height="500" width="900" style="background: #264653; margin:auto; display: block" >
         </svg>
       </div>
       
+      
       <div class= "container">
         <div class="state_container">
+          <p id = "countyText"  class = "directions"> The county map will be shown below when a state is selected.</p>
           <svg id="statemap" height="610" width="600" style="background: #fff; margin-top:50px" >
           </svg>
+          
         </div>
         <div class="infographic">
           <div class ="stateBox" id = "stateDiv">
@@ -169,6 +195,7 @@
             <svg id = "crimeRatio" width = 500 height = 200 ></svg>
 
           </div>
+          
         </div>
       </div>
     </body>
@@ -296,7 +323,6 @@
 
           }
         }
-        console.log(countyDictionary['AK'])       
   
     let colorMatrix = [ ["#C9D7DC", "#99B1D1", "#5E8CD0"],
                         ["#9CC3B6", "#73A4B4", "#4A82B3"],
@@ -382,7 +408,7 @@
                   }
             });
 
-      
+      d3.select("#countyText").text("Select a county to view its county specific police and crime data")
       d3.selectAll(".county").on("click", countyClick);
       d3.selectAll(".county").on("mouseenter", countyHover);
       d3.selectAll(".county").on("mouseout",  countyExit);
@@ -396,13 +422,12 @@
         let fipsID = county.datum().id;
         
         d3.select("#p2").text(fipsToCounty[parseInt(fipsID)])
-        console.log(fipsToCounty[parseInt(fipsID)], fipsToPop[fipsID]);
-
+        
       // PIE CHART
-      
       var data= countyCrimeRates[parseInt(fipsID)]
       var svgCounty = d3.select("#pieChart");
       const pieChart = d3.selectAll("svg#pieChart");
+      
       pieChart.selectAll("*").remove();  
       let g = svgCounty.append("g")
               .attr("transform", "translate(100,150)");
@@ -416,9 +441,8 @@
                     .style("font-size", "14px");
       }
       else{
-        // Creating Pie generator
-      var pie = d3.pie();
-      // Creating arc
+      var pie = d3.pie()
+
       var arc = d3.arc()
                   .innerRadius(0)
                   .outerRadius(100);
@@ -428,72 +452,50 @@
                   .data(pie(data))
                   .enter()
                   .append("g")
-                  .attr("dataVal", console.log(pie(data)));
+                  .attr("dataVal", data)
+
+   
+      var div = d3.select("body").append("div")
+          .attr("class", "tooltip")
+          .style("opacity", 0);
+      
+      let crimeTypes = ["Murder", "Rape", "Robbery", "Assault", "Burgalry", "Larceny", "Motor", "Arson"]
       var colorScale = d3.scaleOrdinal()
                         .domain(["Murder", "Rape", "Robbery", "Assault", "Burgalry", "Larceny", "Motor", "Arson" ])
                         .range(["#264653", "#2A9D8F", "#E9C46A", "#F4A261", "#E76F51", "#05668D", "#E5989B", "#7D80BB"]);
-
-      var div = d3.select("body").append("div")
-          .attr("class", "tooltip-donut")
-          .style("opacity", 0);
-      
-      // Appending path 
-      let crimeTypes = ["Murder", "Rape", "Robbery", "Assault", "Burgalry", "Larceny", "Motor", "Arson"]
-
-      let tooltipWidth = 120;
-      let tooltipHeight = 40;
-      let tooltip = d3.select("#pieChart").append("g")
-                     .attr("class","tooltip")
-                     .attr("visibility","hidden");
-      tooltip.append("rect")
-              .attr("fill", "#56a0bf")
-              .attr("opacity", 0.9)
-              .attr("x", -tooltipWidth / 2.0)
-              .attr("y", 0)
-              .attr("width",tooltipWidth)
-              .attr("height",tooltipHeight)
-      let txt = tooltip.append("text")
-                     .attr("fill", "black")
-                     .attr("text-anchor","middle")
-                     .attr("alignment-baseline","hanging")
-                     .attr("x", 0)
-                     .attr("y", 10);
-     
-
-      let momesh =  d3.select("#pieChart").append("path")
-                        .attr("class","mouseover outline")
-                        .attr("d", "");
 
     
       arcs.append("path")
           .attr("fill", (data, i)=>{
             let value=data.data;
             return colorScale(crimeTypes[i]);
-            
           })
           .attr("d", arc)
           .attr("dataVal", d=> d.data)
-          .on("mouseenter", mouseEntersPlot)
-          .on("mouseout",  mouseLeavesPlot);
+          .on('mouseover', function (d, i) {
+                      d3.select(this).transition()
+                                      .duration('50')
+                                      .attr('opacity', '.85');
+                      div.transition()
+                          .duration(50)
+                          .style("opacity", 1);
+                      console.log(d3.select(this).datum().data)
+                      let num = (d3.format(".1f")(d3.select(this).datum().data*200)).toString() + '%';
+                      div.html(num)
+                          .style("left", (d.pageX + 10) + "px")
+                          .style("top", (d.pageY - 15) + "px");
+                })
+                .on('mouseout', function (d, i) {
+                      d3.select(this).transition()
+                          .duration('50')
+                          .attr('opacity', '1');
+                      div.transition()
+                          .duration('50')
+                          .style("opacity", 0);
+                });
 
-    function mouseEntersPlot() {
-    
-        tooltip.style("visibility","visible")
-    
-    
-        let arc = d3.select(this);
-        // console.log(arc.datum())
-        txt.text(d3.format(".1%")(arc.datum().dataVal));
-        tooltip.attr("transform","translate(100,255)");
 
-    }
-
-    function mouseLeavesPlot() {
-        tooltip.style("visibility","hidden");
-        let arc = d3.select(this);
-        momesh.attr("d", "");
-    }
-          
+    
     svgCounty.selectAll("mydots")
               .data(crimeTypes)
               .enter()
@@ -518,7 +520,7 @@
       }
 
       d3.selectAll("svg#ratio").selectAll("*").remove();
-      var svgRatio = d3.selectAll("#ratio");
+      const svgRatio = d3.selectAll("#ratio");
       if(countyToPolice[parseInt(fipsID)] == undefined){
         svgRatio.append("text")
                 .text("This county did not report any police data for 2016.")
@@ -528,7 +530,7 @@
       }
       else{
         svgRatio.append("text")
-                .text(d3.format(".1f")(countyToPolice[(parseInt(fipsID))] * 1000) + " : 1000")
+                .text(d3.format(".0f")(countyToPolice[(parseInt(fipsID))] * 1000) + " : 1000")
                 .attr("x", 100)
                 .attr("y", 100)
                 .attr("text-anchor", "middle")
@@ -538,9 +540,14 @@
                 .text("police to civilian ratio")
                 .attr("x",170)
                 .attr("y",96)
+                .attr("font-family", "dmsans-regular")
+
       }
+      
+
       d3.selectAll("svg#crimeRatio").selectAll("*").remove();
       var crimeRatio = d3.selectAll("#crimeRatio");
+      
       if(countyToCrime[parseInt(fipsID)] == undefined){
         crimeRatio.append("text")
                 .text("This county did not report any crime data for 2016.")
@@ -558,20 +565,24 @@
 
         crimeRatio.append("text")
                 .text("crimes per ")
-                .attr("x",90)
+                .attr("x",100)
                 .attr("y",96)
+                .attr("font-family", "dmsans-regular")
 
       crimeRatio.append("text")
                 .text("100,000")
-                .attr("x",160)
+                .attr("x",180)
                 .attr("y",100)
                 .attr("class", "ratio")
+                
 
       crimeRatio.append("text")
                 .text("residents")
-                .attr("x",260)
+                .attr("x",280)
                 .attr("y",96)
+                .attr("font-family", "dmsans-regular")
       }
+     
 
     }      
       
@@ -591,6 +602,8 @@
       
     d3.select("#p2").text("")
     d3.selectAll("svg#pieChart").selectAll("*").remove();
+    d3.selectAll("svg#ratio").selectAll("*").remove();
+    d3.selectAll("svg#crimeRatio").selectAll("*").remove();
     d3.selectAll("#p1").text(stateName + " Statistics")
       
     var barChart = d3.selectAll("svg#stateBox"),
