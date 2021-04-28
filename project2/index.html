@@ -1,11 +1,12 @@
 
 <html>
   <head>
-    
+      
       <script src="https://d3js.org/d3.v6.min.js"></script>
       <script src="https://d3js.org/topojson.v2.min.js"></script>
       <style>
 
+      /* Styling for pie chart tooltip  */
       div.tooltip {
           position: absolute;
           text-align: center;
@@ -17,7 +18,7 @@
           pointer-events: none;
           font-size: 1.3rem;
       }
-          
+
       @font-face {
         font-family: dmsans-regular;
         src: url('/font/DMSans-Regular.ttf');
@@ -379,7 +380,7 @@
       let valueExtent = d3.extent(crime, d => d.total_crime);
       let colorScale = d3.scaleSequential(d3.interpolateViridis).domain(valueExtent)
 
-      //determines what to do when you click on a county
+      // determines what to do when you click on a county
       function countyClick() {
         let county = d3.select(this);
         let fipsID = county.datum().id;
