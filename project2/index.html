@@ -94,7 +94,7 @@
             <p id = "p2" class = "stateLabel"></p>
             <svg id = "pieChart" width = 400 height = 250 ></svg>
             <svg id = "ratio" width = 500 height = 100 ></svg>
-            <svg id = "crimeRatio" width = 500 height = 100 ></svg>
+            <svg id = "crimeRatio" width = 500 height = 200 ></svg>
 
           </div>
         </div>
@@ -223,7 +223,8 @@
             }
 
           }
-        }        
+        }
+        console.log(countyDictionary['AK'])       
   
     let colorMatrix = [ ["#C9D7DC", "#99B1D1", "#5E8CD0"],
                         ["#9CC3B6", "#73A4B4", "#4A82B3"],
@@ -288,7 +289,6 @@
       let stateID = state.datum().id;
       var stateAbr = stateToCode[idToState[stateID]];
       var stateName = idToState[stateID]
-      
   
       var projection = d3.geoMercator().fitSize([stWidth-200, stHeight-200], {type: "FeatureCollection", features: countyDictionary[stateAbr]});
       var path = d3.geoPath().projection(projection);
@@ -344,9 +344,9 @@
       }
       else{
         // Creating Pie generator
-      var pie = d3.pie();
+      var pie = d3.layout.pie();
       // Creating arc
-      var arc = d3.arc()
+      var arc = d3.pieChart.arc()
                   .innerRadius(0)
                   .outerRadius(100);
 
@@ -489,7 +489,7 @@
       crimeRatio.append("text")
                 .text("100,000")
                 .attr("x",160)
-                .attr("y",96)
+                .attr("y",100)
                 .attr("class", "ratio")
 
       crimeRatio.append("text")
