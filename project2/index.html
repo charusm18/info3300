@@ -1,11 +1,12 @@
 
 <html>
   <head>
-    
+      
       <script src="https://d3js.org/d3.v6.min.js"></script>
       <script src="https://d3js.org/topojson.v2.min.js"></script>
       <style>
 
+      /* Styling for pie chart tooltip  */
       div.tooltip {
           position: absolute;
           text-align: center;
@@ -17,7 +18,7 @@
           pointer-events: none;
           font-size: 1.3rem;
       }
-          
+
       @font-face {
         font-family: dmsans-regular;
         src: url('/font/DMSans-Regular.ttf');
@@ -145,33 +146,42 @@
       }
 
       .nation {
-    fill: #ddd;
-  }
+        fill: #ddd;
+      }
 
+      .story{
+        text-align:center;
+        margin: auto;
+        width: 50%;
+        font-family: dmsans-regular;
+
+      }
   .directions{
     text-align:center; 
     font-family: dmsans-regular;
   }
  
 
-  /* .outline {
-    stroke: #fff;
-    stroke-width: 1px;
-    fill: none;
-  } */
-    
       </style>
     
     </head>
     <body>
       <div class= "country_container">
-        <p class = "directions">
-          Select a state to see its overall police and crime data 
-        </p>
+        <h1 class = "directions">Policing and Crime in 2016</h1>
+        <p class = "story"> Across the United States, there are varying levels of crime and policing across 
+          different counties. Our project aimed to determine whether there is a correlation
+          between the number of law enforcement in a county and the amount of criminal 
+          activity ocurring in that region. Our hypothesis was that a higher number of 
+          police officers in a state would result in lower reported crime. We were also 
+          interested in seeing the correlation between government spending on law enforcement
+          and crime rates, the assumption being that more spending would result in less crime. 
+        </p> <br>
+        <h3 class = "directions">
+          Click on a state and scroll down to see its overall police and crime data
+        </h3>
         <svg id="usmap" height="500" width="900" style="background: #264653; margin:auto; display: block" >
         </svg>
       </div>
-      
       
       <div class= "container">
         <div class="state_container">
@@ -198,7 +208,17 @@
           </div>
           
         </div>
+        
       </div>
+      <p class = "story"> After looking through the data, we realized that our original assumptions that more police
+        results in lower crime rates was incorrect. We found that it heavily depended on which state we were looking at.
+        In many states, there were counties that indicated a high policing rate and more crime, but in other states
+        there was little to no relationship between the policing rate and crime rate. After doing some research with external
+        sources, we found that more policing does not necessarily lead to a reduction in crime. It does not always lead to an
+        increase in crime, but that is often the case in many states.  
+      </p> <br>
+      <h3 class = "directions"> Charu Murugesan (csm246), Ishika Jain (ij36), Cristie Huang (ch746)</h3>
+     
     </body>
   
     <script>
@@ -229,7 +249,7 @@
 
 
         const count = await d3.json("../counties-10m.json");
-        const us = await d3.json("../us-smaller.json");
+        const us = await d3.json("../us-smaller.json")
 
         const stateNames = await d3.tsv("../us-state-names.tsv");
 
@@ -242,7 +262,8 @@
            .join("path")
            .attr("class", "state")
            .attr("note", d => d.id)
-           .attr("d", path);
+           .attr("d", path)
+
       
         map.append("path").datum(statesMesh)
            .attr("class","outline")
@@ -417,7 +438,7 @@
       let valueExtent = d3.extent(crime, d => d.total_crime);
       let colorScale = d3.scaleSequential(d3.interpolateViridis).domain(valueExtent)
 
-      //determines what to do when you click on a county
+      // determines what to do when you click on a county
       function countyClick() {
         let county = d3.select(this);
         let fipsID = county.datum().id;
@@ -557,23 +578,40 @@
         crimeRatio.append("text")
                 .text("This county did not report any crime data for 2016.")
                 .attr("x",20)
-                .attr("y",96)
+                .attr("y",90)
                 .style("font-size", "14px");
       }
       else{
         crimeRatio.append("text")
                 .text(countyToCrime[(parseInt(fipsID))])
-                .attr("x", 60)
-                .attr("y", 100)
-                .attr("text-anchor", "middle")
+                .attr("x", 90)
+                .attr("y", 90)
+                .attr("text-anchor", "end")
                 .attr("class", "ratio")
                 .style("fill", "#2C7E7E")
-                .style("font-size", "35px");
+
+        
+                .style("font-size", "160%")
 
         crimeRatio.append("text")
-                .text("crimes per 100,000 residents")
-                // .attr("x",120)
-                .attr("y",96)
+                .text("crimes per ")
+                .attr("x",95)
+                .attr("y",87)
+                .attr("font-family", "dmsans-regular")
+
+      crimeRatio.append("text")
+                .text("100,000")
+                .attr("x",180)
+                .attr("y",90)
+                .attr("class", "ratio")
+                .style("font-size", "160%")
+
+                
+
+      crimeRatio.append("text")
+                .text("residents")
+                .attr("x",287)
+                .attr("y",87)
                 .attr("font-family", "dmsans-regular")
                 .style("font-size", "14px")
                 .style("fill", "#535353");
