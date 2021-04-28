@@ -262,7 +262,6 @@
            .attr("class", "state")
            .attr("note", d => d.id)
            .attr("d", path)
-          //  .attr("d", d => { if(d.id != 2) path});
 
       
         map.append("path").datum(statesMesh)
@@ -574,34 +573,37 @@
         crimeRatio.append("text")
                 .text("This county did not report any crime data for 2016.")
                 .attr("x",20)
-                .attr("y",96)
+                .attr("y",90)
                 .style("font-size", "14px");
       }
       else{
         crimeRatio.append("text")
                 .text(countyToCrime[(parseInt(fipsID))])
-                .attr("x", 60)
-                .attr("y", 100)
-                .attr("text-anchor", "middle")
+                .attr("x", 90)
+                .attr("y", 90)
+                .attr("text-anchor", "end")
                 .attr("class", "ratio")
+                .style("font-size", "160%")
 
         crimeRatio.append("text")
                 .text("crimes per ")
-                .attr("x",100)
-                .attr("y",96)
+                .attr("x",95)
+                .attr("y",87)
                 .attr("font-family", "dmsans-regular")
 
       crimeRatio.append("text")
                 .text("100,000")
                 .attr("x",180)
-                .attr("y",100)
+                .attr("y",90)
                 .attr("class", "ratio")
+                .style("font-size", "160%")
+
                 
 
       crimeRatio.append("text")
                 .text("residents")
-                .attr("x",280)
-                .attr("y",96)
+                .attr("x",287)
+                .attr("y",87)
                 .attr("font-family", "dmsans-regular")
       }
      
