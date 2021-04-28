@@ -106,28 +106,37 @@
       }
 
       .nation {
-    fill: #ddd;
-  }
+        fill: #ddd;
+      }
 
-  .directions{
-    text-align:center; 
-  }
+      .directions{
+        text-align:center; 
+      }
+
+      .story{
+        text-align:center;
+        margin: auto;
+        width: 50%;
+      }
  
 
-  /* .outline {
-    stroke: #fff;
-    stroke-width: 1px;
-    fill: none;
-  } */
-    
       </style>
     
     </head>
     <body>
       <div class= "country_container">
-        <p class = "directions">
-          Press on a state to see its overall police and crime data 
+        <h1 class = "directions">Policing and Crime Data in 2016</h1>
+        <p class = "story"> Across the United States, there are varying levels of crime and policing across 
+          different counties. Our project aimed to determine whether there is a correlation
+          between the number of law enforcement in a county and the amount of criminal 
+          activity ocurring in that region. Our hypothesis was that a higher number of 
+          police officers in a state would result in lower reported crime. We were also 
+          interested in seeing the correlation between government spending on law enforcement
+          and crime rates, the assumption being that more spending would result in less crime. 
         </p>
+        <h3 class = "directions">
+          Click on a state to see its overall police and crime data 
+        </h3>
         <svg id="usmap" height="500" width="900" style="background: #264653; margin:auto; display: block" >
         </svg>
       </div>
