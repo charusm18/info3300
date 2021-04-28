@@ -838,10 +838,10 @@
               .attr('y', crimeStateScale(stateToCrime['United States'] ) - 10)
               .text(stateToCrime['United States']);  
                   
-    let leftAxis2 = d3.axisLeft(crimeStateScale).ticks(5).tickSizeOuter(0);
+    let leftAxis2 = d3.axisLeft(crimeStateScale).ticks(3).tickSizeOuter(0);
     crimeChart.append("g")
               .attr("class", "y axis")
-              .attr("transform","translate("+(margin-width-50)+","+(margin-width-100)+")") 
+              .attr("transform","translate("+(margin-width-50)+","+(margin-width-95)+")") 
               .call(leftAxis2);
 
     let bottomAxis3 = d3.axisBottom(stateScale).tickValues([]).tickSizeOuter(0)
