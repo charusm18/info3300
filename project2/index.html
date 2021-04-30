@@ -435,6 +435,7 @@
     }
     // displays the state map and all of its different components 
     function displayState() {
+      window.scrollTo(0,800);
       let state = d3.select(this);
       let stateID = state.datum().id;
       var stateAbr = stateToCode[idToState[stateID]];
@@ -520,10 +521,10 @@
           .attr("class", "tooltip")
           .style("opacity", 0);
       
-      let crimeTypes = ["Murder", "Rape", "Robbery", "Assault", "Burgalry", "Larceny", "Motor", "Arson"]
+      let crimeTypes = ["Murder", "Rape", "Robbery", "Assault", "Burglary", "Larceny", "Motor", "Arson"]
       // maps a specifc color for each type of crime 
       var colorScale = d3.scaleOrdinal()
-                        .domain(["Murder", "Rape", "Robbery", "Assault", "Burgalry", "Larceny", "Motor", "Arson" ])
+                        .domain(["Murder", "Rape", "Robbery", "Assault", "Burglary", "Larceny", "Motor", "Arson" ])
                         .range(["#264653", "#2A9D8F", "#E9C46A", "#F4A261", "#E76F51", "#05668D", "#E5989B", "#7D80BB"]);
 
     
@@ -563,9 +564,9 @@
                           .style("opacity", 0);
                 });
     
-    let legend = ["Murder", "Rape", "Robbery", "Assault", "Burgalry", "Larceny", "Motor Theft", "Arson"]
+    let legend = ["Murder", "Rape", "Robbery", "Assault", "Burglary", "Larceny", "Motor Theft", "Arson"]
     var colorScaleLegend = d3.scaleOrdinal()
-                        .domain(["Murder", "Rape", "Robbery", "Assault", "Burgalry", "Larceny", "Motor Theft", "Arson" ])
+                        .domain(["Murder", "Rape", "Robbery", "Assault", "Burglary", "Larceny", "Motor Theft", "Arson" ])
                         .range(["#264653", "#2A9D8F", "#E9C46A", "#F4A261", "#E76F51", "#05668D", "#E5989B", "#7D80BB"]);
                         
     // creates dots for legends next to pie chart
@@ -741,7 +742,7 @@
             .attr('y',spendingScale(stateToSpending['United States'] ) - 10)
             .text("$"+stateToSpending['United States']+' K');
 
-    let leftAxis = d3.axisLeft(spendingScale).ticks(5).tickSizeOuter(0);
+    let leftAxis = d3.axisLeft(spendingScale).ticks(5).tickSizeOuter(0).tickFormat(d=>{return '$' +(d) + 'K'});
     barChart.append("g")
             .attr("class", "y axis")
             .attr("transform","translate("+(margin-width-50)+","+(margin-width-100)+")") 
